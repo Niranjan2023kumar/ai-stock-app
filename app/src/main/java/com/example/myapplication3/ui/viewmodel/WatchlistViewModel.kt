@@ -295,8 +295,11 @@ class WatchlistViewModel @Inject constructor(
     // ─── Verdict wording — one line, simple English (A4), honest (A5/B6) ──────
 
     private fun verdictFromSignal(sig: TradingSignal): String = when (sig.action) {
-        SignalAction.BUY  ->
-            "Good buy setup today — score ${sig.confidence}/100 (signs lined up, not a guarantee)."
+        SignalAction.BUY  -> when {
+            sig.confidence >= 90 -> "Strong buy setup today — signs are clearly positive. Not a guarantee."
+            sig.confidence >= 84 -> "Good buy setup today — signs line up well. Not a guarantee."
+            else                 -> "Weak buy setup today — signs are mixed. Be careful."
+        }
         SignalAction.SELL ->
             "Selling pressure today — not a day to buy this."
         SignalAction.WAIT ->
