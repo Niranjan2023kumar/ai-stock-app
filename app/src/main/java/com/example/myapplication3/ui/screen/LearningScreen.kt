@@ -246,7 +246,7 @@ fun LearningScreen(navController: NavController) {
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Search term... (e.g. RSI, IPO)") },
+                        placeholder = { Text("Type a word you don't understand...") },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {

@@ -225,14 +225,14 @@ class StockResearchViewModel @Inject constructor(
                 ttsManager.speakText("Practice order saved. This is not real money.")
             } else if (isWatchable(s.symbol, s.currency)) {
                 // Start the foreground watcher so stop-loss/target alerts arrive (F2)
-                TradeWatchService.start(appContext)
+                runCatching { TradeWatchService.start(appContext) }.onFailure { android.util.Log.w("StockResearchVM", "Could not start trade watcher: $it") }
                 ttsManager.speakText("Order saved. I will watch it for you now.")
             } else {
                 // I7/I6 FORCED HONESTY — the watcher force-appends ".NS", so this
                 // stock can never be price-checked. Saying "I will watch it" here
                 // would promise protection that never arrives. Still start the
                 // service: it protects any OTHER open Indian trades.
-                TradeWatchService.start(appContext)
+                runCatching { TradeWatchService.start(appContext) }.onFailure { android.util.Log.w("StockResearchVM", "Could not start trade watcher: $it") }
                 ttsManager.speakText(
                     "Order saved. Note: I can only watch Indian stocks - I cannot alert you for this one."
                 )

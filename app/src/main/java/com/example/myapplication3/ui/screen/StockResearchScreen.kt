@@ -193,7 +193,7 @@ fun StockResearchScreen(navController: NavController) {
                                 shape  = RoundedCornerShape(12.dp)) {
                                 Text(
                                     "Could not refresh — these are old prices" +
-                                        (if (timeStr.isNotEmpty()) " (Cached — $timeStr)" else " (Cached)") +
+                                        (if (timeStr.isNotEmpty()) " (from $timeStr)" else "") +
                                         ". Tap ⟳ to try again.",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurface,

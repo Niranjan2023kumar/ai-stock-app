@@ -1515,7 +1515,7 @@ private fun NseMarketStatusBanner(marketState: String, niftyChange: Double, time
     val brdColor = when { isOpen -> GreenPrimary.copy(alpha = 0.5f); isPre || isPost -> CautionAmber.copy(alpha = 0.5f); else -> RedPrimary.copy(alpha = 0.4f) }
     val txtColor = when { isOpen -> GreenPrimary;       isPre || isPost -> CautionAmber;       else -> RedPrimary }
     val icon     = when { isOpen -> Icons.Default.CheckCircle; isPre -> Icons.Default.Schedule; isPost -> Icons.Default.NightsStay; else -> Icons.Default.Lock }
-    val title    = when { isOpen -> "Market is Open"; isPre -> "Pre-Market"; isPost -> "Market Closed"; else -> "Market Closed" }
+    val title    = when { isOpen -> "Market is Open"; isPre -> "Market opening soon"; isPost -> "Market Closed"; else -> "Market Closed" }
     // Closed → say when it opens, honestly and specifically (B9). Open → NIFTY %
     // move + the countdown, so the timer needs no extra card of its own.
     val sub      = when {
@@ -1546,7 +1546,7 @@ private fun NseMarketStatusBanner(marketState: String, niftyChange: Double, time
             }
             Surface(shape = RoundedCornerShape(6.dp), color = txtColor.copy(alpha = 0.15f)) {
                 Text(
-                    when (marketState) { "REGULAR" -> "LIVE"; "PRE" -> "PRE-OPEN"; else -> "CLOSED" },
+                    when (marketState) { "REGULAR" -> "LIVE"; "PRE" -> "OPENING SOON"; else -> "CLOSED" },
                     style      = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color      = txtColor,
@@ -1569,7 +1569,7 @@ private fun DailyLimitBanner(dailyLoss: Double, maxDailyLoss: Double, onSpeak: (
             Icon(Icons.Default.Warning, null, tint = RedPrimary, modifier = Modifier.size(28.dp))
             Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
                 Text("Daily loss limit reached. Trading is off.", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold, color = RedPrimary)
-                Text("Loss ₹${fmtRs(dailyLoss)} / limit ₹${fmtRs(maxDailyLoss)}. No new trades today.", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text("You lost ₹${fmtRs(dailyLoss)} today. Safety limit is ₹${fmtRs(maxDailyLoss)}. No new trades today.", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
             }
             if (onSpeak != null) SpeakButton(onSpeak)
         }
@@ -1590,7 +1590,7 @@ private fun WeeklyLimitBanner(weekLoss: Double, maxWeekLoss: Double, onSpeak: ((
             Icon(Icons.Default.Warning, null, tint = RedPrimary, modifier = Modifier.size(28.dp))
             Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
                 Text("Enough for this week - we start fresh next week.", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold, color = RedPrimary)
-                Text("Lost ₹${fmtRs(weekLoss)} this week / weekly limit ₹${fmtRs(maxWeekLoss)}. No new trades this week.", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text("You lost ₹${fmtRs(weekLoss)} this week. Weekly safety limit is ₹${fmtRs(maxWeekLoss)}. No new trades this week.", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
             }
             if (onSpeak != null) SpeakButton(onSpeak)
         }
@@ -1925,8 +1925,8 @@ private fun MasterSignalCard(
                 // Trade stats
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     StatChip("Shares", if (signal.recommendedQty >= 1) "${signal.recommendedQty}" else "—", TextPrimary)
-                    StatChip("Gain vs loss", "${String.format(java.util.Locale.US, "%.1f", signal.riskReward)}:1", if (signal.riskReward >= 2.0) GreenPrimary else CautionAmber)
-                    StatChip("Risk",   signal.riskLevel.name, when (signal.riskLevel) { RiskLevel.LOW -> GreenPrimary; RiskLevel.MEDIUM -> CautionAmber; else -> RedPrimary })
+                    StatChip("For every ₹1 risk", "gain ₹${String.format(java.util.Locale.US, "%.1f", signal.riskReward)}", if (signal.riskReward >= 2.0) GreenPrimary else CautionAmber)
+                    StatChip("Risk level", when (signal.riskLevel.name) { "LOW" -> "Low — safe"; "HIGH" -> "High — easy to lose"; else -> "Medium" }, when (signal.riskLevel) { RiskLevel.LOW -> GreenPrimary; RiskLevel.MEDIUM -> CautionAmber; else -> RedPrimary })
                 }
 
                 HorizontalDivider(color = DarkBorder)

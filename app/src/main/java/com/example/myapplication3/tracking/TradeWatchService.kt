@@ -257,7 +257,7 @@ class TradeWatchService : Service() {
     companion object {
         private const val TAG = "TradeWatchService"
         private const val FG_ID = 4201
-        private const val CHECK_INTERVAL_MS = 90_000L       // ~90s Yahoo poll while market is open
+        private const val CHECK_INTERVAL_MS = 45_000L       // ~45s Yahoo poll while market is open
         private const val LIVE_CHECK_INTERVAL_MS = 15_000L  // ~15s re-check when live ticks flow
         private const val CLOSED_INTERVAL_MS = 30 * 60_000L // 30 min while market is closed
         private const val MAX_REPEAT_ALERTS = 3               // TARGET-hit only: insist 2–3 times, then go quiet (C15a)

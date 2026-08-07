@@ -63,16 +63,17 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val saved = userSettings.settingsOnce()
-            _uiState.update {
-                it.copy(
-                    capital = saved.capital,
-                    riskPerTrade = saved.riskPerTradePercent,
-                    maxDailyLoss = saved.dailyLossPercent,
-                    maxWeeklyLoss = saved.weeklyLossPercent,
-                    isLoaded = true
-                )
-            }
+            runCatching { userSettings.settingsOnce() }.getOrNull()?.let { saved ->
+                _uiState.update {
+                    it.copy(
+                        capital = saved.capital,
+                        riskPerTrade = saved.riskPerTradePercent,
+                        maxDailyLoss = saved.dailyLossPercent,
+                        maxWeeklyLoss = saved.weeklyLossPercent,
+                        isLoaded = true
+                    )
+                }
+            } ?: _uiState.update { it.copy(isLoaded = true) }
         }
     }
 

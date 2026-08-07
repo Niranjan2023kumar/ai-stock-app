@@ -87,8 +87,20 @@ class SipReminderWorker @AssistedInject constructor(
         const val WORK_NAME = "sip_reminder"
         private val NOTIFICATION_ID = "sip-reminder".hashCode()
 
-        /** Daily local check — no network needed, so no constraints. */
-        fun buildPeriodicRequest(): PeriodicWorkRequest =
-            PeriodicWorkRequestBuilder<SipReminderWorker>(24, TimeUnit.HOURS).build()
+        /** Daily local check at ~9 AM — no network needed, so no constraints. */
+        fun buildPeriodicRequest(): PeriodicWorkRequest {
+            val now = java.util.Calendar.getInstance()
+            val target = java.util.Calendar.getInstance().apply {
+                set(java.util.Calendar.HOUR_OF_DAY, 9)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+            }
+            if (!target.after(now)) target.add(java.util.Calendar.DAY_OF_MONTH, 1)
+            val initialDelayMs = target.timeInMillis - now.timeInMillis
+            return PeriodicWorkRequestBuilder<SipReminderWorker>(24, TimeUnit.HOURS)
+                .setInitialDelay(initialDelayMs, TimeUnit.MILLISECONDS)
+                .build()
+        }
     }
 }

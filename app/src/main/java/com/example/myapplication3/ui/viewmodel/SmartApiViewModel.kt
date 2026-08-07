@@ -54,10 +54,11 @@ class SmartApiViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val c = store.current()
-            _state.update {
-                it.copy(apiKey = c.apiKey, clientCode = c.clientCode, mpin = c.mpin,
-                    totpSecret = c.totpSecret, configured = c.isComplete)
+            runCatching { store.current() }.getOrNull()?.let { c ->
+                _state.update {
+                    it.copy(apiKey = c.apiKey, clientCode = c.clientCode, mpin = c.mpin,
+                        totpSecret = c.totpSecret, configured = c.isComplete)
+                }
             }
         }
     }

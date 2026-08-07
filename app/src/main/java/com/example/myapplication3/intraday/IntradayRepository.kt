@@ -1,4 +1,4 @@
-
+﻿
 
 
 package com.example.myapplication3.intraday
@@ -68,7 +68,7 @@ class IntradayRepository @Inject constructor(
         // News TTL cache: the 30s auto-refresh must NOT re-fire up to NEWS_VET_CAP
         // Yahoo news calls every tick. A per-symbol headline read stays valid for
         // this long (mirrors INTRADAY_READ_TTL_MS) — data + rate-limit safety (E3d).
-        private const val NEWS_CACHE_TTL_MS = 12 * 60 * 1000L
+        private const val NEWS_CACHE_TTL_MS = 5 * 60 * 1000L
         // Freshness cutoff: a headline older than this — or of unknown age
         // (providerPublishTime == 0) — can no longer move a stock's confidence.
         private const val NEWS_MAX_AGE_MS = 72L * 60 * 60 * 1000L
@@ -394,9 +394,20 @@ class IntradayRepository @Inject constructor(
     fun loadCachedSignals(): List<TradingSignal> = runCatching {
         val json = prefs.getString("sig_json", null) ?: return emptyList()
         val arr = JSONArray(json)
-        (0 until arr.length()).mapNotNull { i ->
+        var signals = (0 until arr.length()).mapNotNull { i ->
             runCatching { arr.getJSONObject(i).toSignal() }.getOrNull()
         }
+        // If cached data is from a previous trading day, mark it clearly
+        val cachedAtMs = getCacheTimestampMs()
+        if (cachedAtMs > 0L) {
+            val dateFmt = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US)
+            val cacheDate = dateFmt.format(java.util.Date(cachedAtMs))
+            val todayDate = dateFmt.format(java.util.Date())
+            if (cacheDate != todayDate) {
+                signals = signals.map { it.copy(validUntil = "From yesterday") }
+            }
+        }
+        signals
     }.getOrElse { emptyList() }
 
     fun loadCachedHealth(): MarketHealth? = runCatching {
@@ -415,8 +426,8 @@ class IntradayRepository @Inject constructor(
 
     fun getCacheTimestampMs(): Long = prefs.getLong("cache_ts", 0L)
 
-    /** Returns true if cached data is older than [maxAgeMs] ms (default 4 hours). */
-    fun isCacheStale(maxAgeMs: Long = 4 * 60 * 60 * 1000L): Boolean {
+    /** Returns true if cached data is older than [maxAgeMs] ms (default 30 minutes). */
+    fun isCacheStale(maxAgeMs: Long = 30 * 60 * 1000L): Boolean {
         val ts = getCacheTimestampMs()
         return ts == 0L || System.currentTimeMillis() - ts > maxAgeMs
     }
@@ -425,14 +436,8 @@ class IntradayRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             if (symbols.isEmpty()) return@withContext emptyMap()
             val nsSymbols = symbols.map { if (it.endsWith(".NS")) it else "$it.NS" }
-            // Cheap first try: one v7 batch call (works again if Yahoo ever restores it)
-            val v7 = runCatching { fetchV7Batch(nsSymbols, fastClient) }.getOrElse { emptyList() }
-            if (v7.isNotEmpty()) {
-                return@withContext v7.associate { it.symbol.removeSuffix(".NS") to it.price }
-            }
-            // v7 is dead (HTTP 401 without a crumb) — the stop-loss watcher MUST still
-            // get prices. One v8 chart call per symbol: open-trade lists are tiny and
-            // chartClient shares the parallel dispatcher, so the fan-out is cheap.
+            // v7 is dead (HTTP 401 without a crumb) - v8 chart per symbol is the only path.
+            // Open-trade lists are tiny and chartClient shares the parallel dispatcher.
             runCatching {
                 coroutineScope {
                     nsSymbols.map { sym ->
@@ -1008,33 +1013,14 @@ class IntradayRepository @Inject constructor(
      *  to the caller and the honest cached/stale behavior stays unchanged (B8).
      */
     private suspend fun fetchAllQuotes(): List<SignalEngine.StockQuote> = coroutineScope {
-        val v7Deferred = async(Dispatchers.IO) {
-            withTimeoutOrNull(12_000L) {                       // was 18s — fail over faster
-                runCatching { fetchV7Chunked(watchlist, chunkSize = 100) }.getOrElse {
-                    Log.w(TAG, "v7 chunked failed: ${it.message}")
-                    emptyList()
-                }
-            } ?: emptyList()
-        }
-
-        val v8Deferred = async(Dispatchers.IO) {
-            fetchAllViaChart(watchlist)   // FULL 200 symbols — starts IMMEDIATELY, in parallel with v7
-        }
-
-        val v7Quotes = v7Deferred.await()
-        Log.d(TAG, "Stage A (v7 chunked): ${v7Quotes.size} stocks")
-
-        // ALWAYS wait for v8 too — v7 quotes carry no historicalCloses, and without
-        // them the X-day low/high filter silently degrades to 52-week data with a
-        // wrong label. v8 (full watchlist) supplies real 1-year close history.
-        val v8Quotes = v8Deferred.await()
+        // v7 (Yahoo Finance bulk quote) is dead (HTTP 401 without a crumb) - v8 chart
+        // is the sole reliable path. v8 covers the FULL watchlist with real 1-year
+        // close history; the NSE fallback below activates only when v8 is mostly empty.
+        val v8Quotes = fetchAllViaChart(watchlist)
         Log.d(TAG, "Stage B (v8 chart full): ${v8Quotes.size} stocks")
 
-        // Always merge — v8 wins for overlapping symbols (it carries historicalCloses),
-        // but v7-only symbols must never be discarded.
-        val v8Symbols = v8Quotes.map { it.symbol }.toSet()
-        val combined  = v8Quotes + v7Quotes.filter { it.symbol !in v8Symbols }
-        Log.d(TAG, "Combined: ${combined.size} stocks (v8=${v8Quotes.size}, v7-extra=${combined.size - v8Quotes.size})")
+        val combined = v8Quotes
+        Log.d(TAG, "Combined: ${combined.size} stocks")
 
         // ── NSE FALLBACK (single-source risk) ────────────────────────────────
         // Yahoo effectively down ⇒ try NSE for universe quote basics. Never
@@ -1159,19 +1145,6 @@ class IntradayRepository @Inject constructor(
         }.flatMap { it.await() }
         if (all.isEmpty()) throw Exception("v7 returned no data from any host")
         all
-    }
-
-    /** Legacy single-request v7 — kept for compatibility with ScannerWorker price checks */
-    private fun fetchV7Single(symbols: List<String>): List<SignalEngine.StockQuote> {
-        val syms = symbols.joinToString(",")
-        for (host in YF_HOSTS) {
-            val body = runCatching {
-                fetchUrl("https://$host/v7/finance/quote?symbols=$syms&lang=en&region=IN", fastClient)
-            }.getOrNull() ?: continue
-            val q = parseV7Quotes(body)
-            if (q.isNotEmpty()) return q
-        }
-        throw Exception("v7 returned no data from any host")
     }
 
     /** Batch v7 for specific symbols (used by ScannerWorker price checks) */

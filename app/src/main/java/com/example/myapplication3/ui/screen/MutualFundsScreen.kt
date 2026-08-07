@@ -599,7 +599,7 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "How to start a SIP (3 steps)",
+                    text = "How to begin investing (3 steps)",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary,
@@ -988,8 +988,8 @@ private fun MfFundCard(
                         }
                     }
                 }
-                MfReturnChip("1Y", fund.return1y)
-                MfReturnChip("3Y", fund.return3y)
+                MfReturnChip("Last year", fund.return1y)
+                MfReturnChip("Last 3 yrs", fund.return3y)
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = null,
@@ -1110,7 +1110,7 @@ private fun MfReturnChip(label: String, value: Double?) {
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = value?.let { String.format(Locale.US, "%+.1f%%", it) } ?: "—",
+            text = value?.let { String.format(Locale.US, "%+.1f%% per yr", it) } ?: "—",
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             color = color

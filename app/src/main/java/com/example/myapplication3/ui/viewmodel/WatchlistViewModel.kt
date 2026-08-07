@@ -141,7 +141,9 @@ class WatchlistViewModel @Inject constructor(
         s.removeSuffix(".NS").removeSuffix(".BO").uppercase()
 
     fun removeFromWatchlist(symbol: String) {
-        viewModelScope.launch { watchlistDao.deleteBySymbol(symbol) }
+        viewModelScope.launch {
+            runCatching { watchlistDao.deleteBySymbol(symbol) }.onFailure { android.util.Log.w("WatchlistVM", "Delete failed: $it") }
+        }
     }
 
     // ─── Per-row price + verdict (spec H10) ───────────────────────────────────
