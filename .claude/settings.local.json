@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "PowerShell",
+      "Bash(Find \"C:\\\\Users\\\\shant\\\\AndroidStudioProjects\\\\MyApplication3\" -type f -name \"build.gradle.kts\" -o -name \"settings.gradle.kts\")",
+      "Bash(Find \"C:\\\\Users\\\\shant\\\\AndroidStudioProjects\\\\MyApplication3\" -type f \\\\\\( -name \"*.env\" -o -name \"*.properties\" -o -name \"local.properties\" -o -name \"secrets.xml\" \\\\\\))",
+      "Bash(/c/Users/shant/AppData/Local/Android/Sdk/platform-tools/adb.exe shell *)",
+      "Bash(/c/Users/shant/AppData/Local/Android/Sdk/platform-tools/adb.exe exec-out *)",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://query1.finance.yahoo.com/v8/finance/chart/RELIANCE.NS?interval=1d&range=1y&includePrePost=false\" -o /tmp/rel.json)",
+      "Bash(python3 -)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'Baseline before review fixes *)",
+      "Bash(\"/c/Users/shant/AppData/Local/Android/Sdk/platform-tools/adb.exe\" devices *)",
+      "Bash(git config *)",
+      "Bash(printf '\\\\nbuild/\\\\n.kotlin/\\\\n')",
+      "Bash(git rm *)",
+      "Bash(export JAVA_HOME=\"/c/Program Files/Android/Android Studio/jbr\")",
+      "Bash(./gradlew :app:assembleDebug --console=plain -q)",
+      "Bash(/c/Users/shant/AppData/Local/Android/Sdk/platform-tools/adb.exe install *)",
+      "Bash(ADB=\"/c/Users/shant/AppData/Local/Android/Sdk/platform-tools/adb.exe\"; \"$ADB\" shell settings put global verifier_verify_adb_installs 0; \"$ADB\" install -r app/build/outputs/apk/debug/app-debug.apk && \"$ADB\" shell monkey -p com.example.myapplication3 -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 8; \"$ADB\" exec-out screencap -p > /tmp/simple_stock.png && echo shot_ok)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\shant\\\\AndroidStudioProjects\\\\MyApplication3\\\\app\\\\src\\\\main\\\\java\\\\com\\\\example\\\\myapplication3\\\\ui\\\\screen\\\\HomeScreen.kt\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\shant\\\\AndroidStudioProjects\\\\MyApplication3\\\\app\\\\src\\\\main\\\\java\\\\com\\\\example\\\\myapplication3\\\\ui\\\\screen\\\\TradingScreen.kt\" | Measure-Object -Line\\).Lines)"
+    ]
+  }
+}

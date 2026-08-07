@@ -1,0 +1,1063 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "819976f49524446c64af2d01c19e2403",
+    "entities": [
+      {
+        "tableName": "candles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`symbol` TEXT NOT NULL, `exchange` TEXT NOT NULL, `interval` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `open` REAL NOT NULL, `high` REAL NOT NULL, `low` REAL NOT NULL, `close` REAL NOT NULL, `volume` INTEGER NOT NULL, `deliveryVolume` INTEGER NOT NULL, `vwap` REAL NOT NULL, `isComplete` INTEGER NOT NULL, `insertedAt` INTEGER NOT NULL, PRIMARY KEY(`symbol`, `exchange`, `interval`, `timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exchange",
+            "columnName": "exchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "interval",
+            "columnName": "interval",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "open",
+            "columnName": "open",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "high",
+            "columnName": "high",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "low",
+            "columnName": "low",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "close",
+            "columnName": "close",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volume",
+            "columnName": "volume",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryVolume",
+            "columnName": "deliveryVolume",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vwap",
+            "columnName": "vwap",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isComplete",
+            "columnName": "isComplete",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "insertedAt",
+            "columnName": "insertedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "symbol",
+            "exchange",
+            "interval",
+            "timestamp"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_candles_symbol_exchange_interval_timestamp",
+            "unique": false,
+            "columnNames": [
+              "symbol",
+              "exchange",
+              "interval",
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_candles_symbol_exchange_interval_timestamp` ON `${TABLE_NAME}` (`symbol`, `exchange`, `interval`, `timestamp`)"
+          },
+          {
+            "name": "index_candles_symbol_timestamp",
+            "unique": false,
+            "columnNames": [
+              "symbol",
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_candles_symbol_timestamp` ON `${TABLE_NAME}` (`symbol`, `timestamp`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "recommendations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `exchange` TEXT NOT NULL, `generatedAt` INTEGER NOT NULL, `direction` TEXT NOT NULL, `currentPrice` REAL NOT NULL, `entryPrice` REAL NOT NULL, `stopLoss` REAL NOT NULL, `target1` REAL NOT NULL, `target2` REAL NOT NULL, `riskRewardRatio` REAL NOT NULL, `confidenceScore` REAL NOT NULL, `riskScore` REAL NOT NULL, `thesis` TEXT NOT NULL, `triggeredSignalsJson` TEXT NOT NULL, `contributingNewsJson` TEXT NOT NULL, `riskFactorsJson` TEXT NOT NULL, `indicatorValuesJson` TEXT NOT NULL, `status` TEXT NOT NULL, `outcome` TEXT, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exchange",
+            "columnName": "exchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generatedAt",
+            "columnName": "generatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentPrice",
+            "columnName": "currentPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entryPrice",
+            "columnName": "entryPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopLoss",
+            "columnName": "stopLoss",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target1",
+            "columnName": "target1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target2",
+            "columnName": "target2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "riskRewardRatio",
+            "columnName": "riskRewardRatio",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidenceScore",
+            "columnName": "confidenceScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "riskScore",
+            "columnName": "riskScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thesis",
+            "columnName": "thesis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "triggeredSignalsJson",
+            "columnName": "triggeredSignalsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contributingNewsJson",
+            "columnName": "contributingNewsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "riskFactorsJson",
+            "columnName": "riskFactorsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "indicatorValuesJson",
+            "columnName": "indicatorValuesJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "outcome",
+            "columnName": "outcome",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_recommendations_symbol_generatedAt",
+            "unique": false,
+            "columnNames": [
+              "symbol",
+              "generatedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_recommendations_symbol_generatedAt` ON `${TABLE_NAME}` (`symbol`, `generatedAt`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "news",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `headline` TEXT NOT NULL, `summary` TEXT NOT NULL, `source` TEXT NOT NULL, `url` TEXT NOT NULL, `publishedAt` INTEGER NOT NULL, `relatedSymbolsJson` TEXT NOT NULL, `category` TEXT NOT NULL, `sentiment` TEXT NOT NULL, `sentimentScore` REAL NOT NULL, `impactScore` REAL NOT NULL, `confidenceScore` REAL NOT NULL, `aiSummary` TEXT NOT NULL, `keyPointsJson` TEXT NOT NULL, `insertedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "headline",
+            "columnName": "headline",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "summary",
+            "columnName": "summary",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publishedAt",
+            "columnName": "publishedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relatedSymbolsJson",
+            "columnName": "relatedSymbolsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sentiment",
+            "columnName": "sentiment",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sentimentScore",
+            "columnName": "sentimentScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "impactScore",
+            "columnName": "impactScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidenceScore",
+            "columnName": "confidenceScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aiSummary",
+            "columnName": "aiSummary",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keyPointsJson",
+            "columnName": "keyPointsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "insertedAt",
+            "columnName": "insertedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_news_publishedAt",
+            "unique": false,
+            "columnNames": [
+              "publishedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_news_publishedAt` ON `${TABLE_NAME}` (`publishedAt`)"
+          },
+          {
+            "name": "index_news_relatedSymbolsJson",
+            "unique": false,
+            "columnNames": [
+              "relatedSymbolsJson"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_news_relatedSymbolsJson` ON `${TABLE_NAME}` (`relatedSymbolsJson`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "watchlist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`symbol` TEXT NOT NULL, `exchange` TEXT NOT NULL, `name` TEXT NOT NULL, `sector` TEXT NOT NULL, `addedAt` INTEGER NOT NULL, `notes` TEXT NOT NULL, PRIMARY KEY(`symbol`))",
+        "fields": [
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exchange",
+            "columnName": "exchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sector",
+            "columnName": "sector",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedAt",
+            "columnName": "addedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "symbol"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "portfolio_positions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `exchange` TEXT NOT NULL, `direction` TEXT NOT NULL, `quantity` INTEGER NOT NULL, `averageEntryPrice` REAL NOT NULL, `currentPrice` REAL NOT NULL, `stopLoss` REAL NOT NULL, `target1` REAL NOT NULL, `target2` REAL NOT NULL, `recommendationId` TEXT NOT NULL, `openedAt` INTEGER NOT NULL, `closedAt` INTEGER, `closingPrice` REAL, `status` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exchange",
+            "columnName": "exchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageEntryPrice",
+            "columnName": "averageEntryPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentPrice",
+            "columnName": "currentPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopLoss",
+            "columnName": "stopLoss",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target1",
+            "columnName": "target1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target2",
+            "columnName": "target2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recommendationId",
+            "columnName": "recommendationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openedAt",
+            "columnName": "openedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "closedAt",
+            "columnName": "closedAt",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "closingPrice",
+            "columnName": "closingPrice",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_portfolio_positions_symbol_status",
+            "unique": false,
+            "columnNames": [
+              "symbol",
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_portfolio_positions_symbol_status` ON `${TABLE_NAME}` (`symbol`, `status`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "audit_trail",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `recommendationId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `symbol` TEXT NOT NULL, `inputsJson` TEXT NOT NULL, `scoresJson` TEXT NOT NULL, `newsUsedJson` TEXT NOT NULL, `indicatorsUsedJson` TEXT NOT NULL, `signalsUsedJson` TEXT NOT NULL, `finalRecommendation` TEXT NOT NULL, `aiModelUsed` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recommendationId",
+            "columnName": "recommendationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inputsJson",
+            "columnName": "inputsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scoresJson",
+            "columnName": "scoresJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "newsUsedJson",
+            "columnName": "newsUsedJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "indicatorsUsedJson",
+            "columnName": "indicatorsUsedJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signalsUsedJson",
+            "columnName": "signalsUsedJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "finalRecommendation",
+            "columnName": "finalRecommendation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aiModelUsed",
+            "columnName": "aiModelUsed",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_audit_trail_recommendationId",
+            "unique": false,
+            "columnNames": [
+              "recommendationId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_audit_trail_recommendationId` ON `${TABLE_NAME}` (`recommendationId`)"
+          },
+          {
+            "name": "index_audit_trail_timestamp",
+            "unique": false,
+            "columnNames": [
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_audit_trail_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "backtest_results",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `strategyName` TEXT NOT NULL, `fromDate` INTEGER NOT NULL, `toDate` INTEGER NOT NULL, `period` TEXT NOT NULL, `totalTrades` INTEGER NOT NULL, `winningTrades` INTEGER NOT NULL, `losingTrades` INTEGER NOT NULL, `winRate` REAL NOT NULL, `profitFactor` REAL NOT NULL, `sharpeRatio` REAL NOT NULL, `sortinoRatio` REAL NOT NULL, `maxDrawdown` REAL NOT NULL, `cagr` REAL NOT NULL, `expectancy` REAL NOT NULL, `totalReturn` REAL NOT NULL, `averageWin` REAL NOT NULL, `averageLoss` REAL NOT NULL, `largestWin` REAL NOT NULL, `largestLoss` REAL NOT NULL, `averageHoldingPeriodMinutes` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `monteCarloJson` TEXT, `walkForwardJson` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "strategyName",
+            "columnName": "strategyName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fromDate",
+            "columnName": "fromDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toDate",
+            "columnName": "toDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "period",
+            "columnName": "period",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalTrades",
+            "columnName": "totalTrades",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "winningTrades",
+            "columnName": "winningTrades",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "losingTrades",
+            "columnName": "losingTrades",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "winRate",
+            "columnName": "winRate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profitFactor",
+            "columnName": "profitFactor",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sharpeRatio",
+            "columnName": "sharpeRatio",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortinoRatio",
+            "columnName": "sortinoRatio",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxDrawdown",
+            "columnName": "maxDrawdown",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cagr",
+            "columnName": "cagr",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expectancy",
+            "columnName": "expectancy",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalReturn",
+            "columnName": "totalReturn",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageWin",
+            "columnName": "averageWin",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageLoss",
+            "columnName": "averageLoss",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "largestWin",
+            "columnName": "largestWin",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "largestLoss",
+            "columnName": "largestLoss",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageHoldingPeriodMinutes",
+            "columnName": "averageHoldingPeriodMinutes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "monteCarloJson",
+            "columnName": "monteCarloJson",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "walkForwardJson",
+            "columnName": "walkForwardJson",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "sector_data",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sector` TEXT NOT NULL, `advances` INTEGER NOT NULL, `declines` INTEGER NOT NULL, `unchanged` INTEGER NOT NULL, `strengthScore` REAL NOT NULL, `momentumScore` REAL NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`sector`, `timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "sector",
+            "columnName": "sector",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "advances",
+            "columnName": "advances",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "declines",
+            "columnName": "declines",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unchanged",
+            "columnName": "unchanged",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "strengthScore",
+            "columnName": "strengthScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "momentumScore",
+            "columnName": "momentumScore",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sector",
+            "timestamp"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "search_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `symbol` TEXT NOT NULL, `name` TEXT NOT NULL, `searchedAt` INTEGER NOT NULL, `lastPrice` REAL NOT NULL, `exchange` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "searchedAt",
+            "columnName": "searchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPrice",
+            "columnName": "lastPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exchange",
+            "columnName": "exchange",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "tracked_trades",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `name` TEXT NOT NULL, `orderType` TEXT NOT NULL, `action` TEXT NOT NULL, `isPractice` INTEGER NOT NULL, `entryPrice` REAL NOT NULL, `quantity` INTEGER NOT NULL, `stopLoss` REAL NOT NULL, `target1` REAL NOT NULL, `target2` REAL NOT NULL, `target3` REAL NOT NULL, `openedAt` INTEGER NOT NULL, `status` TEXT NOT NULL, `exitPrice` REAL, `closedAt` INTEGER, `realizedPnl` REAL, `confidenceAtPick` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderType",
+            "columnName": "orderType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPractice",
+            "columnName": "isPractice",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entryPrice",
+            "columnName": "entryPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopLoss",
+            "columnName": "stopLoss",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target1",
+            "columnName": "target1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target2",
+            "columnName": "target2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "target3",
+            "columnName": "target3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openedAt",
+            "columnName": "openedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exitPrice",
+            "columnName": "exitPrice",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "closedAt",
+            "columnName": "closedAt",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "realizedPnl",
+            "columnName": "realizedPnl",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "confidenceAtPick",
+            "columnName": "confidenceAtPick",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '819976f49524446c64af2d01c19e2403')"
+    ]
+  }
+}

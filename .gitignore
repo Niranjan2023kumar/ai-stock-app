@@ -1,0 +1,28 @@
+# Android/Gradle
+.gradle/
+build/
+*/build/
+local.properties
+*.iml
+.idea/
+*.hprof
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystore / secrets
+*.jks
+*.keystore
+avast-root.cer
+combined-cacerts.jks
+
+# Backups (large zips)
+backups/
+*.zip
+
+# Windows shortcuts
+*.lnk
+
+# OS files
+.DS_Store
+Thumbs.db
