@@ -1028,10 +1028,14 @@ private fun MfFundCard(
                         )
                     } else {
                         // U6.2: labelled a GUESS, never a promise.
+                        // When no 3-year history: say we assumed 8%, don't let user
+                        // think X is this fund's own projected return.
+                        val noHistory = fund.return3y == null
                         Text(
                             text = "If you invest ₹1,000 a month, in 5 years it could become about " +
                                     "₹${formatIndianRupees(projectSipValue(1_000, 5, fund.return3y))}" +
-                                    " — only a guess, not a promise.",
+                                    if (noHistory) " — rough guess using 8% (no fund history yet)."
+                                    else " — only a guess, not a promise.",
                             fontSize = 11.sp,
                             color = GoldLight,
                             lineHeight = 15.sp,
@@ -1344,23 +1348,41 @@ private fun MfSipCalculator(
                     }
                     // Label each scenario by its OWN growth rate — never "at least/at most"
                     // (which inverts when the fund's 3Y return is below 8%).
-                    Text(
-                        text = "If it grows about 8% a year: ₹${formatIndianRupees(conservativeValue)}",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = TextPrimary,
-                        lineHeight = 18.sp
-                    )
-                    // No fund-specific growth line for a losing fund — a clamped +1%
-                    // would quietly turn a loser into a growth story
-                    if (!fundHasLost) {
+                    // When return3y is null (no history), show only 8% and say so clearly.
+                    if (return3y == null) {
                         Text(
-                            text = "If it grows about ${String.format(Locale.US, "%.1f", annualPct)}% a year: ₹${formatIndianRupees(futureValue)}",
+                            text = "No 3-year history for this fund — using 8% as a rough market average.",
+                            fontSize = 11.sp,
+                            color = TextSecondary,
+                            lineHeight = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "If it grows about 8% a year: ₹${formatIndianRupees(conservativeValue)}",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextPrimary,
                             lineHeight = 18.sp
                         )
+                    } else {
+                        Text(
+                            text = "If it grows about 8% a year: ₹${formatIndianRupees(conservativeValue)}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextPrimary,
+                            lineHeight = 18.sp
+                        )
+                        // No fund-specific growth line for a losing fund — a clamped +1%
+                        // would quietly turn a loser into a growth story
+                        if (!fundHasLost) {
+                            Text(
+                                text = "If it grows about ${String.format(Locale.US, "%.1f", annualPct)}% a year: ₹${formatIndianRupees(futureValue)}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary,
+                                lineHeight = 18.sp
+                            )
+                        }
                     }
                     Text(
                         text = "This is only a guess, not a promise",

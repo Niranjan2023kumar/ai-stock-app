@@ -1642,7 +1642,7 @@ private fun MasterSignalCard(
     val actionIcon  = if (isBuy) Icons.Default.TrendingUp else Icons.Default.TrendingDown
     // ONE staleness condition for every card (panel #2): the screen-level cached
     // flag OR this quote's own cached stamp — identical formula on master + compact.
-    val isCached    = signal.validUntil == "Cached" || screenStale
+    val isCached    = signal.validUntil == "Cached" || signal.validUntil == "From yesterday" || screenStale
     // Real-time tick wins over the snapshot the signal carries
     val effPrice    = livePrice?.takeIf { it > 0.0 } ?: signal.currentPrice
 
@@ -2034,7 +2034,7 @@ private fun CompactSignalCard(
     val actionColor = if (signal.action == SignalAction.BUY) GreenPrimary else RedPrimary
     // ONE staleness condition for every card (panel #2) — same formula as
     // MasterSignalCard, so identical siblings can never disagree.
-    val isCached    = signal.validUntil == "Cached" || screenStale
+    val isCached    = signal.validUntil == "Cached" || signal.validUntil == "From yesterday" || screenStale
     // C12a also protects the smaller cards — a passed chance must say so
     val chancePassed = !isCached && (signal.chanceGone || signal.buyChancePassed())
     Card(

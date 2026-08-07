@@ -282,7 +282,7 @@ class DataBackup @Inject constructor(
     // ── Prefs ─────────────────────────────────────────────────────────────────
 
     private suspend fun prefsToJson(): JSONObject {
-        val p = dataStore.data.first()
+        val p = runCatching { dataStore.data.first() }.getOrNull() ?: return JSONObject()
         val o = JSONObject()
         p[keyCapital]?.let { o.put("capital", it) }
         p[keyRiskPct]?.let { o.put("riskPerTradePercent", it) }

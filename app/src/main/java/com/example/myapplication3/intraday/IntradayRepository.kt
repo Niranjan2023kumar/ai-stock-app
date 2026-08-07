@@ -1119,53 +1119,7 @@ class IntradayRepository @Inject constructor(
         emptyList()
     }
 
-    /**
-     * Chunked v7 bulk fetch — splits [symbols] into [chunkSize]-symbol batches,
-     * fetches each chunk independently, then merges results.
-     * Handles watchlists of any size reliably.
-     */
-    private suspend fun fetchV7Chunked(symbols: List<String>, chunkSize: Int = 100): List<SignalEngine.StockQuote> = coroutineScope {
-        // Chunks fetched in PARALLEL (was sequential — halved the wait for 200 symbols)
-        val all = symbols.chunked(chunkSize).mapIndexed { idx, chunk ->
-            async(Dispatchers.IO) {
-                for (host in YF_HOSTS) {
-                    val body = runCatching {
-                        val syms = chunk.joinToString(",")
-                        fetchUrl("https://$host/v7/finance/quote?symbols=$syms&lang=en&region=IN", fastClient)
-                    }.getOrNull() ?: continue
-                    val q = parseV7Quotes(body)
-                    if (q.isNotEmpty()) {
-                        Log.d(TAG, "v7 chunk $idx: ${q.size}/${chunk.size} from $host")
-                        return@async q
-                    }
-                }
-                Log.w(TAG, "v7 chunk $idx failed entirely")
-                emptyList()
-            }
-        }.flatMap { it.await() }
-        if (all.isEmpty()) throw Exception("v7 returned no data from any host")
-        all
-    }
-
-    /** Batch v7 for specific symbols (used by ScannerWorker price checks) */
-    private fun fetchV7Batch(symbols: List<String>, client: OkHttpClient): List<SignalEngine.StockQuote> {
-        return try {
-            val syms = symbols.joinToString(",")
-            for (host in YF_HOSTS) {
-                val body = runCatching {
-                    fetchUrl("https://$host/v7/finance/quote?symbols=$syms&lang=en&region=IN", client)
-                }.getOrNull() ?: continue
-                val q = parseV7Quotes(body)
-                if (q.isNotEmpty()) return q
-            }
-            emptyList()
-        } catch (e: Exception) {
-            Log.w(TAG, "fetchV7Batch failed: ${e.message}")
-            emptyList()
-        }
-    }
-
-    // ─── Stage A: Yahoo Finance v7 ────────────────────────────────────────────
+    // ─── Yahoo Finance v7 parse (kept for format reference only) ─────────────
 
     private fun parseV7Quotes(body: String): List<SignalEngine.StockQuote> = runCatching {
         val results = JSONObject(body)
@@ -2237,7 +2191,7 @@ class IntradayRepository @Inject constructor(
             riskLevel           = RiskLevel.valueOf(optString("risk", "MEDIUM")),
             reasons             = (0 until r.length()).map { r.getString(it) },
             validUntil          = "Cached",
-            tradeValidityTime   = "Cached Data",
+            tradeValidityTime   = "Old price — refreshing",
             isBeginnerSafe      = optString("risk", "MEDIUM") == "LOW",
             marketState         = optString("state", "CLOSED"),
             sectorStrength      = optString("sector", "NEUTRAL"),

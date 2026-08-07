@@ -434,6 +434,26 @@ private fun KeyStatsCard(state: StockResearchData) {
                     if (state.ma50 > 0 && state.currentPrice > state.ma50) GreenPrimary else RedPrimary)
                 ResearchStatItem("200-day average", if (state.ma200 > 0) "$cur${fmtMoney(cur, state.ma200)}" else "—",
                     if (state.ma200 > 0 && state.currentPrice > state.ma200) GreenPrimary else RedPrimary)
+            }
+            // Plain-English verdict for the averages (I1 zero-knowledge)
+            if (state.ma50 > 0 && state.ma200 > 0) {
+                val aboveMa50 = state.currentPrice > state.ma50
+                val aboveMa200 = state.currentPrice > state.ma200
+                val avgVerdict = when {
+                    aboveMa50 && aboveMa200 -> "This stock is above both its averages — usually a healthy sign."
+                    aboveMa50 && !aboveMa200 -> "Short-term looks OK, but still below its long-term average — mixed signals."
+                    !aboveMa50 && aboveMa200 -> "Recent days are weak, though it holds above its long-term average."
+                    else -> "This stock is below both its averages — it may be struggling right now."
+                }
+                Text(
+                    text = avgVerdict,
+                    fontSize = 11.sp,
+                    color = if (aboveMa50 && aboveMa200) GreenPrimary else if (!aboveMa50 && !aboveMa200) RedPrimary else GoldAccent,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 ResearchStatItem("Shares traded", formatVolume(state.volume),
                     if (state.avgVolume > 0 && state.volume > state.avgVolume) GreenPrimary
                     else MaterialTheme.colorScheme.onSurface)

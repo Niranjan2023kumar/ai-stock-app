@@ -768,7 +768,9 @@ class InterdayViewModel @Inject constructor(
         // (e.g. StockResearchViewModel, which falls back to false) agrees with
         // the practice=true default above from the very first session.
         viewModelScope.launch {
-            if (dataStore.data.first()[practiceKey] == null) dataStore.edit { it[practiceKey] = true }
+            runCatching {
+                if (dataStore.data.first()[practiceKey] == null) dataStore.edit { it[practiceKey] = true }
+            }
         }
         loadCachedThenFetch()
         startAutoRefresh()

@@ -205,7 +205,7 @@ class StockResearchViewModel @Inject constructor(
         val s = _state.value
         if (fillPrice <= 0.0 || quantity < 1) return
         viewModelScope.launch {
-            val practice = dataStore.data.first()[booleanPreferencesKey("practice_mode")] ?: false
+            val practice = runCatching { dataStore.data.first()[booleanPreferencesKey("practice_mode")] }.getOrNull() ?: false
             tradeTracker.open(
                 symbol     = s.symbol,
                 name       = s.name.ifEmpty { s.symbol },
