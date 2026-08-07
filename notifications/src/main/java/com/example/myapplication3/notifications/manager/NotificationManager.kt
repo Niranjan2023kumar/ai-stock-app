@@ -64,8 +64,8 @@ class StockNotificationManager @Inject constructor(
         val remaining = limit - loss
         sendNotification(
             "daily-limit-warning".hashCode(),
-            "Daily Loss Warning",
-            "₹${String.format("%.0f", loss)} lost today. Only ₹${String.format("%.0f", remaining)} remaining before limit.",
+            "Loss Warning",
+            "You have lost ₹${String.format("%.0f", loss)} today. Only ₹${String.format("%.0f", remaining)} more before the app stops suggesting trades.",
             Constants.CHANNEL_ID_ALERTS
         )
     }
@@ -80,18 +80,18 @@ class StockNotificationManager @Inject constructor(
         sendNotification(
             "$symbol-sl".hashCode(),
             "🔴 SELL $symbol NOW",
-            "Stop-loss hit at ₹${String.format("%.2f", price)}. Open Groww and sell. $note".trim(),
+            "Price fell to your safety level ₹${String.format("%.2f", price)}. Open Groww and sell. $note".trim(),
             Constants.CHANNEL_ID_ALERTS
         )
     }
 
-    /** Live target-hit alert with a buzz — time to book profit. */
+    /** Live target-hit alert with a buzz — price reached the user's target. */
     fun alertTargetLive(symbol: String, price: Double) {
         vibrateStrong()
         sendNotification(
             "$symbol-target".hashCode(),
             "🎯 $symbol hit your target",
-            "Price reached ₹${String.format("%.2f", price)}. Open Groww and sell to book profit.",
+            "Price reached ₹${String.format("%.2f", price)}. Open Groww and sell to take your profit.",
             Constants.CHANNEL_ID_ALERTS
         )
     }

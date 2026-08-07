@@ -48,11 +48,11 @@ class SipReminderWorker @AssistedInject constructor(
     private fun postReminder(record: SipRecord, today: Calendar) {
         val onSipDay = today.get(Calendar.DAY_OF_MONTH) == record.sipDay
         val amount = formatIndianRupees(record.monthlyAmount.toLong())
-        val title = if (onSipDay) "Today is SIP day" else "Did your SIP money go?"
+        val title = if (onSipDay) "Today is your monthly investment day" else "Did your monthly investment go?"
         val text = if (onSipDay) {
-            "Did your ₹$amount get taken? Open the app to confirm."
+            "Did your ₹$amount get taken this month? Open the app to confirm."
         } else {
-            "Your SIP day (day ${record.sipDay}) has passed. " +
+            "Your monthly investment day (day ${record.sipDay}) has passed. " +
                     "Did your ₹$amount get taken? Open the app to confirm."
         }
 

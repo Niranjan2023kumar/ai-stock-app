@@ -309,13 +309,13 @@ private fun LedgerRowCard(row: LedgerRow) {
     }
 }
 
-// ── Result chip: PASS green / FAIL red / PENDING grey (U9.3) ─────────────────
+// ── Result chip: plain English — "It worked" / "Didn't work" / "Still waiting" (U9.3 / I1)
 @Composable
 private fun ResultChip(result: String) {
     val (bg, ink, label) = when (result) {
-        SuggestionLedger.RESULT_PASS -> Triple(GreenContainer, GreenLight, "PASS")
-        SuggestionLedger.RESULT_FAIL -> Triple(RedContainer, RedLight, "FAIL")
-        else -> Triple(DarkSurfaceElevated, TextSecondary, "PENDING")
+        SuggestionLedger.RESULT_PASS -> Triple(GreenContainer, GreenLight, "It worked")
+        SuggestionLedger.RESULT_FAIL -> Triple(RedContainer, RedLight, "Didn't work")
+        else -> Triple(DarkSurfaceElevated, TextSecondary, "Still waiting")
     }
     Surface(shape = RoundedCornerShape(6.dp), color = bg) {
         Text(

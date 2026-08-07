@@ -2101,7 +2101,7 @@ private fun CompactSignalCard(
                         // for all these cards sits under the section header above.
                         Text(verdictWord(signal.confidence), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.ExtraBold, color = actionColor)
                         Text("Target: ₹${fmtRs(signal.targetPrice)}", style = MaterialTheme.typography.labelSmall, color = GreenPrimary)
-                        Text("Stop loss: ₹${fmtRs(signal.stopLoss)}", style = MaterialTheme.typography.labelSmall, color = RedPrimary)
+                        Text("Safety stop: ₹${fmtRs(signal.stopLoss)}", style = MaterialTheme.typography.labelSmall, color = RedPrimary)
                     }
                 }
             }
