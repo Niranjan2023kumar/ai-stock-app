@@ -20,13 +20,7 @@ data class SettingsUiState(
     val saveError: String? = null
 ) {
     // One-line, plain-word checks (I2/I6) — shown inline AND enforced on Save.
-    val capitalError: String?
-        get() = when {
-            capital <= 0.0 -> "Your money must be more than 0."
-            capital < 100.0 -> "Enter at least ₹100."
-            capital > 100_000_000.0 -> "That looks too big — please check the number."
-            else -> null
-        }
+    // Capital is READ-ONLY (set by daily check-in, not here — E5/C13/I3).
     val riskError: String?
         get() = when {
             riskPerTrade <= 0.0 -> "This must be more than 0."
@@ -47,7 +41,7 @@ data class SettingsUiState(
             else -> null
         }
     val firstError: String?
-        get() = capitalError ?: riskError ?: dailyLossError ?: weeklyLossError
+        get() = riskError ?: dailyLossError ?: weeklyLossError
 }
 
 /**
@@ -82,7 +76,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateCapital(value: Double)       = _uiState.update { it.copy(capital = value) }
     fun updateRiskPerTrade(value: Double)  = _uiState.update { it.copy(riskPerTrade = value) }
     fun updateMaxDailyLoss(value: Double)  = _uiState.update { it.copy(maxDailyLoss = value) }
     fun updateMaxWeeklyLoss(value: Double) = _uiState.update { it.copy(maxWeeklyLoss = value) }

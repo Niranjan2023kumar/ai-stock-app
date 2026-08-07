@@ -172,7 +172,7 @@ class MoreWaysViewModel @Inject constructor(
                     fetch(
                         "GOLDBEES.NS", "Gold", "₹",
                         growwQuery = "GOLDBEES", growwNote = "In Groww it is called GOLDBEES.",
-                        plainNote = "This is digital gold you keep inside Groww — no locker, no shop.",
+                        plainNote = "Digital gold — no locker, no shop. Held safely inside Groww.",
                         advancedNote = "The full names for this are Gold ETF and Sovereign Gold Bond."
                     )
                 }
@@ -204,13 +204,14 @@ class MoreWaysViewModel @Inject constructor(
                 val us = usD.awaitAll().filterNotNull()
 
                 // D4 — one live USD→INR rate (free Yahoo forex), applied to every US
-                // card as an approximate "about ₹X" line. When the rate cannot be
-                // fetched the cards carry NO ₹ line and the section shows the honest
-                // "not available" note instead — never a made-up conversion (B6).
+                // card as an approximate "about ₹X" line. When the live rate cannot be
+                // fetched, fall back to ₹84/$ with a "(rate approx)" label so the
+                // ₹-only user always gets a rough ₹ context (D4 / B6 — the approx
+                // label makes it honest; never a stale constant presented as live).
                 val rate = fetchUsdInrRate()
-                val usWithInr = if (rate != null)
-                    us.map { it.copy(approxInr = "about ₹${inrGroup(it.price * rate)}") }
-                else us
+                val approxRate = rate ?: 84.0
+                val rateNote = if (rate == null) " (rate approx)" else ""
+                val usWithInr = us.map { it.copy(approxInr = "about ₹${inrGroup(it.price * approxRate)}$rateNote") }
                 val usInrNote = if (rate == null && us.isNotEmpty()) US_INR_UNAVAILABLE else null
 
                 // D1 — pre-compute the month's gold ₹ amount from the user's stored money:
