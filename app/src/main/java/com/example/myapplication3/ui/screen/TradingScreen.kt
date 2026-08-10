@@ -521,7 +521,7 @@ private fun AiTradeContent(
                     lossAmount = amt,
                     onSpeak = {
                         vm.speakText(
-                            "Your stop loss did its job. It closed the trade at ${amt.toInt()} rupees loss, " +
+                            "Your safety stop worked. It closed the trade at ${amt.toInt()} rupees loss, " +
                             "instead of a bigger loss. The system is working. Tomorrow is a new day."
                         )
                     },
@@ -1021,7 +1021,7 @@ private fun AfterLossTrustCard(
             ) {
                 Text("🛡️", fontSize = 18.sp)
                 Text(
-                    "Your stop-loss did its job",
+                    "Your safety stop worked",
                     fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = GreenLight,
                     modifier = Modifier.weight(1f)
                 )
@@ -1914,7 +1914,7 @@ private fun MasterSignalCard(
                 if (signal.trailingStop > 0) {
                     if (isBuy) {
                         Text(
-                            "When the price crosses ₹${fmtRs(signal.targetPrice)} (Target 1): in Groww, change your stop-loss sell price from ₹${fmtRs(signal.stopLoss)} to ₹${fmtRs(signal.trailingStop)} — this locks in profit.",
+                            "When the price crosses ₹${fmtRs(signal.targetPrice)} (Target 1): in Groww, change your safety sell price from ₹${fmtRs(signal.stopLoss)} to ₹${fmtRs(signal.trailingStop)} — this locks in profit.",
                             fontSize = 12.sp, lineHeight = 16.sp, color = TextSecondary
                         )
                     } else {

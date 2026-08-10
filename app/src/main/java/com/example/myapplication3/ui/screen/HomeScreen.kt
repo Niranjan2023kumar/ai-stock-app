@@ -953,7 +953,7 @@ private fun ExploreTabContent(
                     lossAmount = amt,
                     onSpeak = {
                         vm.speakText(
-                            "Your stop loss did its job. It closed the trade at ${amt.toInt()} rupees loss, " +
+                            "Your safety stop worked. It closed the trade at ${amt.toInt()} rupees loss, " +
                             "instead of a bigger loss. The system is working. Tomorrow is a new day."
                         )
                     },
@@ -1626,7 +1626,7 @@ private fun AfterLossTrustCard(
             ) {
                 Text("🛡️", fontSize = 18.sp)
                 Text(
-                    "Your stop-loss did its job",
+                    "Your safety stop worked",
                     fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = GreenLight,
                     modifier = Modifier.weight(1f)
                 )

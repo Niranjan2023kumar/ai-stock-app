@@ -427,7 +427,7 @@ private fun AlertsSection(onResult: (String) -> Unit) {
         VoiceSwitchRow()
         HindiVoiceSwitchRow()
         Text(
-            text = if (alertsOn) "Alerts are ON — the app can warn you (stop-loss, SIP day)."
+            text = if (alertsOn) "Alerts are ON — the app can warn you (safety stops, monthly investment day)."
                    else "Alerts are OFF — the app cannot warn you. Tap the banner at the top of this page to turn them on.",
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
