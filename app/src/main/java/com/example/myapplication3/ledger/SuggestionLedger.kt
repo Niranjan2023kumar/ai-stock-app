@@ -158,6 +158,52 @@ class SuggestionLedger @Inject constructor(
         }
     }
 
+    /**
+     * Aggregated stats for Mon–today in the current IST week, across BOTH tabs
+     * (F6.3 weekly report card). Returns null when there are no decided rows yet
+     * — callers MUST hide the card when null, never show made-up numbers.
+     */
+    data class WeekStats(
+        val pass: Int,
+        val fail: Int,
+        val pending: Int
+    )
+
+    suspend fun thisWeekStats(): WeekStats? = withContext(Dispatchers.IO) {
+        runCatching {
+            val ist = java.util.TimeZone.getTimeZone("Asia/Kolkata")
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+            sdf.timeZone = ist
+            val today = java.util.Calendar.getInstance(ist)
+            // Roll back to Monday of this week
+            val dayOfWeek = today.get(java.util.Calendar.DAY_OF_WEEK)
+            val daysFromMon = if (dayOfWeek == java.util.Calendar.SUNDAY) 6
+                              else dayOfWeek - java.util.Calendar.MONDAY
+            val monday = (today.clone() as java.util.Calendar).apply {
+                add(java.util.Calendar.DAY_OF_YEAR, -daysFromMon)
+                set(java.util.Calendar.HOUR_OF_DAY, 0)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+            }
+            val mondayStr = sdf.format(monday.time)
+            val todayStr  = sdf.format(today.time)
+
+            val allRows = mutex.withLock {
+                listOf(TAB_STOCK, TAB_INTRADAY).flatMap { tab ->
+                    val name = normalizedTab(tab) ?: return@flatMap emptyList<LedgerRow>()
+                    readRowsLocked(fileFor(name))
+                }
+            }
+            val weekRows = allRows.filter { it.date in mondayStr..todayStr }
+            if (weekRows.none { it.result != RESULT_PENDING }) return@runCatching null
+            WeekStats(
+                pass    = weekRows.count { it.result == RESULT_PASS },
+                fail    = weekRows.count { it.result == RESULT_FAIL },
+                pending = weekRows.count { it.result == RESULT_PENDING }
+            )
+        }.getOrElse { null }
+    }
+
     /** All rows of [tab]'s record, oldest first. Empty on any failure (B8). */
     suspend fun readRows(tab: String): List<LedgerRow> = withContext(Dispatchers.IO) {
         mutex.withLock {
