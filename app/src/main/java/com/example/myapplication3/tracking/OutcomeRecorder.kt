@@ -188,7 +188,7 @@ class OutcomeRecorder @Inject constructor(
                 AfterLossInfo(
                     symbol = last.symbol,
                     lossAmount = amount,
-                    message = "Your stop-loss did its job on ${last.symbol} — it closed the trade at a " +
+                    message = "Your safety stop worked on ${last.symbol} — it closed the trade at a " +
                         "₹${formatRupeesIndian(amount)} loss, instead of a bigger loss. " +
                         "The system is working. Tomorrow is a new day."
                 )

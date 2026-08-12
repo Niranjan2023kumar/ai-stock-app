@@ -2070,7 +2070,7 @@ private fun CompactSignalCard(
                 if (onSpeak != null) SpeakButton(onSpeak)
                 Surface(shape = RoundedCornerShape(6.dp), color = if (chancePassed) CautionAmber else actionColor) {
                     Text(
-                        if (chancePassed) "PASSED" else signal.action.name,
+                        if (chancePassed) "Too late" else signal.action.name,
                         color = TextOnGold, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     )
                 }

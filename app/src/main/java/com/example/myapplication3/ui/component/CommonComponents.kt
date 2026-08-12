@@ -347,7 +347,7 @@ fun NotificationsOffBanner() {
         ) {
             Text("🔕", fontSize = 14.sp)
             Text(
-                "Alerts are OFF — I cannot warn you about stop-loss. Tap to turn on.",
+                "Alerts are OFF — I cannot warn you about safety stops. Tap to turn on.",
                 fontSize   = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color      = TextPrimary,
@@ -424,11 +424,11 @@ fun MyStockCard(
 
     val (verdict, color, canSell) = when {
         currentPrice <= 0.0 ->
-            Triple("HOLD — checking the price…", TextSecondary, false)
+            Triple("Checking the price…", TextSecondary, false)
         trade.target1 > 0.0 && currentPrice >= trade.target1 ->
-            Triple("SELL now — target reached, book your profit", GreenLight, true)
+            Triple("SELL now — target reached, take your profit", GreenLight, true)
         trade.stopLoss > 0.0 && currentPrice <= trade.stopLoss ->
-            Triple("SELL now — near your stop-loss, protect your money", RedLight, true)
+            Triple("SELL now — near your safety stop, protect your money", RedLight, true)
         // Signs-of-falling re-score: warn BEFORE the stop physically hits when the
         // setup has died (app's own SELL signal, or trend + momentum rolled over).
         // Real signal data only — absent for a symbol we can't judge, so this branch
@@ -438,9 +438,9 @@ fun MyStockCard(
         // "still ahead" wording (was "still away"); guard the ₹0 case when a trade
         // was recorded without a target, so the user never reads "target ₹0".
         trade.target1 > 0.0 ->
-            Triple("Hold — target ₹${rs(trade.target1)} is still ahead", TextPrimary, false)
+            Triple("Still watching — target ₹${rs(trade.target1)} is ahead", TextPrimary, false)
         else ->
-            Triple("Hold — I'm watching this for you", TextPrimary, false)
+            Triple("Watching this for you", TextPrimary, false)
     }
 
     // Voice-parity (U1.5): the SpeakButton reads the SAME words the card shows —

@@ -280,7 +280,7 @@ private fun LedgerRowCard(row: LedgerRow) {
                     append(if (row.action.equals("SELL", ignoreCase = true)) "Sell" else "Buy")
                     append(" · suggested at ").append(rupees(row.suggestedPrice))
                     if (row.target > 0.0) append(" · target ").append(rupees(row.target))
-                    if (row.stopLoss > 0.0) append(" · stop-loss ").append(rupees(row.stopLoss))
+                    if (row.stopLoss > 0.0) append(" · safety stop ").append(rupees(row.stopLoss))
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary

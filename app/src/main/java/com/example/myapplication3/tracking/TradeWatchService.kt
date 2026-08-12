@@ -154,7 +154,7 @@ class TradeWatchService : Service() {
                             stopBaselineLoss[t.id] = loss
                             stopLastAlertMs[t.id] = nowMs
                             notifier.alertStopLossLive(t.symbol, px, "Loss so far ₹${loss.toInt()}.")
-                            tts.speakText("Sell ${t.symbol} now. It has fallen to your stop-loss at ${px.toInt()} rupees.")
+                            tts.speakText("Sell ${t.symbol} now. It has fallen to your safety level at ${px.toInt()} rupees.")
                         } else if (lastMs == null || nowMs - lastMs >= STOP_REPEAT_INTERVAL_MS) {
                             // Still breached and open: re-alert with the growing-loss line.
                             stopLastAlertMs[t.id] = nowMs
