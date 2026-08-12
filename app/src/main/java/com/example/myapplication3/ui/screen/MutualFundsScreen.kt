@@ -47,8 +47,10 @@ import com.example.myapplication3.mutualfunds.MutualFund
 import com.example.myapplication3.mutualfunds.MutualFundRepository
 import com.example.myapplication3.mutualfunds.SipRecord
 import com.example.myapplication3.ui.component.NotificationsOffBanner
+import com.example.myapplication3.ui.component.TodayPnlBar
 import com.example.myapplication3.ui.component.formatIndianRupees
 import com.example.myapplication3.ui.theme.*
+import com.example.myapplication3.ui.viewmodel.InterdayViewModel
 import com.example.myapplication3.ui.viewmodel.MutualFundsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -195,6 +197,11 @@ fun MutualFundsScreen(navController: NavController) {
     val vm: MutualFundsViewModel = hiltViewModel()
     val state by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    // F1.5: P&L bar — same activity-scoped instance HomeScreen uses
+    val interdayVm: InterdayViewModel = hiltViewModel()
+    val todayPnl by interdayVm.todayRealizedPnl.collectAsStateWithLifecycle()
+    val openTrades by interdayVm.openTrades.collectAsStateWithLifecycle()
+    val practiceMode by interdayVm.practiceMode.collectAsStateWithLifecycle(false)
 
     // ── Disk cache of the last good curated list ("yesterday's prices") ──
     // Read once, off the main thread — rendered while the fresh load runs,
@@ -246,6 +253,13 @@ fun MutualFundsScreen(navController: NavController) {
                         .background(DarkBackground)
                         .padding(bottom = 6.dp)
                 ) {
+                    // F1.5: today's P&L — same bar as Stock/Intraday tabs; hides when
+                    // nothing to show (component self-guards on zero P&L + no trades).
+                    TodayPnlBar(
+                        realizedPnl   = todayPnl,
+                        openTradeCount = openTrades.size,
+                        practiceMode  = practiceMode
+                    )
                     // E1: alerts-off warning pinned on every tab — renders nothing
                     // while alerts are deliverable (shared self-contained banner)
                     NotificationsOffBanner()

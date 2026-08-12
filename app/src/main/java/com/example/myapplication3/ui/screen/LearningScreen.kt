@@ -34,9 +34,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication3.navigation.Screen
+import com.example.myapplication3.ui.component.TodayPnlBar
 import com.example.myapplication3.ui.theme.GoldAccent
 import com.example.myapplication3.ui.theme.GreenPrimary
 import com.example.myapplication3.ui.theme.RedPrimary
+import com.example.myapplication3.ui.viewmodel.InterdayViewModel
 import com.example.myapplication3.ui.viewmodel.LearningViewModel
 
 // ══════════════════════════════════════════════════════════════════
@@ -54,6 +56,11 @@ fun LearningScreen(navController: NavController) {
     val vm: LearningViewModel = hiltViewModel()
     val readLessons by vm.readLessons.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    // F1.5: running P&L — same activity-scoped VM as Stock/Intraday tabs
+    val interdayVm: InterdayViewModel = hiltViewModel()
+    val todayPnl by interdayVm.todayRealizedPnl.collectAsStateWithLifecycle()
+    val openTrades by interdayVm.openTrades.collectAsStateWithLifecycle()
+    val practiceMode by interdayVm.practiceMode.collectAsStateWithLifecycle(false)
 
     // C24 — the glossary is Advanced content and starts COLLAPSED: a beginner
     // never meets a wall of market words unless they ask for it
@@ -96,6 +103,15 @@ fun LearningScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(top = 14.dp, bottom = 24.dp)
         ) {
+            // F1.5: P&L bar at the top — hides itself when nothing to show
+            item {
+                TodayPnlBar(
+                    realizedPnl    = todayPnl,
+                    openTradeCount = openTrades.size,
+                    practiceMode   = practiceMode,
+                    modifier       = Modifier.padding(horizontal = (-16).dp)
+                )
+            }
             // ── Lessons that make you money (C21) ─────────────────────────
             item {
                 Column {
