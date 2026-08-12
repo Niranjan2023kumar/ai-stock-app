@@ -101,13 +101,15 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 ---
 
 ## WHAT HAS BEEN DONE (do not redo)
-- [x] Fix waves v1.1–v1.6: full jargon sweep, crash safety, dead API removal
+- [x] Fix waves v1.1–v1.7: full jargon sweep, crash safety, dead API removal
 - [x] GitHub Actions CI: builds APK on every push, releases/latest always has latest APK
-- [x] "stop-loss" → "safety stop" in ALL screens, TTS, notifications, and OutcomeRecorder
+- [x] "stop-loss" → "safety stop" in ALL user-facing strings, TTS, notifications, OutcomeRecorder, LearningScreen
 - [x] "book profit" → "take your profit"
-- [x] "SIP" → "monthly investment" in SipReminderWorker
+- [x] "SIP" → "monthly investment" in user-facing strings
 - [x] PASSED verdict → "Too late" in CommonComponents
-- [x] HOLD → "Checking the price…" / "Watching this for you" / "Still watching"
+- [x] HOLD → "Checking the price…" / "Watching this for you" / "Still watching" / "Watching" badge
+- [x] "(bullish)"/"(bearish)" → "(rising trend)"/"(falling trend)" in StockResearchViewModel
+- [x] HindiTtsManager: all TTS is plain English (A4 compliance) — no Hindi speech
 - [x] NotificationManager: "Price fell to your safety level" (was "Stop-loss hit")
 - [x] TradeWatchService TTS: "safety level" (was "stop-loss")
 - [x] OutcomeRecorder: "Your safety stop worked" (was "stop-loss did its job")
@@ -116,28 +118,28 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 - [x] CI: contents:write permission for GitHub Releases
 - [x] CI: strips Windows-only gradle.properties paths (org.gradle.java.home, Avast truststore)
 - [x] CI: API keys from GitHub Secrets (not hardcoded)
+- [x] F1.1: GrowwLauncher.openStock() — Groww deep-link on every BUY card (GrowwActionRow)
+- [x] F1.2: INTRADAY/DELIVERY order type label on every BUY card (GrowwActionRow)
+- [x] F1.3: "Order placed? Yes/No" confirm on return from Groww (GrowwActionRow + PendingOrderConfirmDialog)
+- [x] F1.4: Per-target exact share counts (computeTargetSplit() in GrowwAction.kt)
+- [x] F2.3: Stale-entry protection — buyChancePassed() used in TradingScreen + HomeScreen; "From yesterday" cache invalidation in IntradayRepository
 
 ---
 
 ## BUILD ORDER — WHAT TO DO NEXT
 Work through these IN ORDER. One item per wave. Update this file after each item.
 
-### F1 — Money loop (START HERE — highest priority)
-- [ ] **F1.1** Groww deep-link button on every BUY/SELL card
-      Opens Groww app directly on that stock's page (Intent with symbol).
-      Fallback: Groww search with symbol. Fallback 2: Play Store page.
-      Plain label: "Open Groww and place this order"
-- [ ] **F1.2** "INTRADAY order" / "DELIVERY order" label — big and unmissable on every card
-- [ ] **F1.3** "Order placed? Yes / No" confirm on returning from Groww (onResume check)
-      On Yes: pre-fill live price, user confirms, journal tracking starts
-- [ ] **F1.4** Per-target exact share counts ("Sell 2 shares at Target 1, 1 share at Target 2")
-- [ ] **F1.5** Today's running P&L bar always visible at top of every main tab
+### F1 — Money loop ✅ MOSTLY DONE
+- [x] **F1.1** Groww deep-link button on every BUY card (GrowwActionRow in GrowwAction.kt)
+- [x] **F1.2** "INTRADAY order" / "DELIVERY order" label on every BUY card (GrowwActionRow)
+- [x] **F1.3** "Order placed? Yes / No" confirm on return from Groww (GrowwActionRow + PendingOrderConfirmDialog)
+- [x] **F1.4** Per-target exact share counts (computeTargetSplit in GrowwAction.kt)
+- [ ] **F1.5** Today's running P&L bar always visible at top of every main tab (START HERE)
 
 ### F2 — Protection on real phones
 - [ ] **F2.1** Vibrating repeat alerts (2–3 times) for stop-loss + target hits
 - [ ] **F2.2** 3:15 PM vibrating alarm for any open intraday position ("Open Groww and sell now")
-- [ ] **F2.3** Stale-entry protection: when live price moves past entry zone, card changes to
-              "This chance has passed — do not buy now. See the next one." (buy instructions vanish)
+- [x] **F2.3** Stale-entry protection: "This chance passed — wait for the next one." (TradingScreen + HomeScreen)
 - [ ] **F2.4** Battery/autostart setup guide on first launch (Xiaomi/Vivo/Oppo/Realme/Samsung)
 
 ### F3 — Right path for user's money
@@ -208,5 +210,5 @@ In simple English. With a voice option. While the app silently protects them fro
 **When that is true on a real phone, the project is done.**
 
 ---
-*Last updated by operator: 2026-08-13*
+*Last updated by operator: 2026-08-13 (session 2 — jargon sweep complete, F1.1–F1.4 done, next: F1.5 P&L bar)*
 *Source of truth: docs/REQUIREMENTS_FINAL.md — never contradict it*

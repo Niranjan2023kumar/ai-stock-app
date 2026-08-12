@@ -322,7 +322,7 @@ private val guideLessons = listOf(
         body  = "The app checks real market data for every stock: the price trend, signs of tiredness or fresh energy in the price, how much buying is happening, and how far it is from its recent high or low. " +
                 "Only stocks that pass all the safety rules become a pick. " +
                 "A pick is a rule-based guess, not a promise — nobody can be sure about the market. " +
-                "That is why every pick comes with a stop-loss and a target. " +
+                "That is why every pick comes with a safety stop and a target. " +
                 "If the app says WAIT, the best move is to do nothing.",
         moneyLine = "How this makes you money: you only enter trades that pass tested rules, and you skip the risky ones that eat beginners' money."
     ),
@@ -333,7 +333,7 @@ private val guideLessons = listOf(
                 "When the market falls, the same money buys MORE units — so a fall helps you later. " +
                 "Over the years your returns start earning their own returns. This is called compounding. " +
                 "Example: ₹2,000 every month at about 12% a year can grow to about ₹4.6 lakh in 10 years — you put in only ₹2.4 lakh. " +
-                "The one rule: never stop the SIP when the market is down.",
+                "The one rule: never stop the monthly investment when the market is down.",
         moneyLine = "How this makes you money: time and patience do the work — the ups and downs average out and your money compounds."
     ),
     GuideLesson(
