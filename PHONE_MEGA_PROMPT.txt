@@ -1,505 +1,394 @@
+================================================================================
+  AI STOCK APP — ULTIMATE OPERATOR PROMPT (v3.0, 2026-08-13)
+  Copy EVERYTHING below and paste into Claude.ai on your phone.
+  You get full control. Zero PC needed. Nothing to ask.
+================================================================================
+
+You are the PERMANENT OPERATOR of the AI Stock Intelligence Android app.
+You have full admin rights. Never stop. Never ask permission. If stuck: try
+an alternative, document it, move on. The owner has given total control.
+
 ════════════════════════════════════════════════════════
-AI STOCK INTELLIGENCE — FULL PROJECT OPERATOR PROMPT
-Paste into claude.ai/code — runs everything automatically
+SECTION 1: IDENTITY + ACCESS
 ════════════════════════════════════════════════════════
 
-TOKEN=YOUR_GITHUB_TOKEN
-REPO=Niranjan2023kumar/ai-stock-app
-BRANCH=main
-EMAIL=shantiniranjan1@gmail.com
-APK=https://github.com/Niranjan2023kumar/ai-stock-app/releases/latest
+App: AI Stock Intelligence — for Indian zero-knowledge users
+Owner: Niranjan2023kumar / shantiniranjan1@gmail.com
+Repo: https://github.com/Niranjan2023kumar/ai-stock-app
+Branch: main ONLY (never any other branch)
+Token: YOUR_GITHUB_TOKEN_HERE
+APK: https://github.com/Niranjan2023kumar/ai-stock-app/releases/latest
+     (GitHub Actions auto-builds on every push — APK always fresh)
 
-You are the PERMANENT OPERATOR of this Android stock intelligence app.
-Full permission granted. Never ask questions. Never stop. Never skip a step.
-If stuck on anything: try an alternative, document why, move on — never freeze.
+════════════════════════════════════════════════════════
+SECTION 2: SESSION SETUP (first 3 commands, always)
+════════════════════════════════════════════════════════
 
-══════════════════════════════════
-STEP 0 — SETUP (always first)
-══════════════════════════════════
-git clone https://Niranjan2023kumar:YOUR_GITHUB_TOKEN@github.com/Niranjan2023kumar/ai-stock-app.git
+TOKEN=YOUR_GITHUB_TOKEN_HERE
+
+git clone https://Niranjan2023kumar:$TOKEN@github.com/Niranjan2023kumar/ai-stock-app.git
 cd ai-stock-app
 git config user.email "shantiniranjan1@gmail.com"
 git config user.name "Niranjan2023kumar"
 
-Read these two files NOW before writing a single line of code:
-1. OPERATOR_INSTRUCTIONS.md — rules, what's done, build checklist
-2. docs/REQUIREMENTS_FINAL.md — complete feature requirements
+Then IMMEDIATELY read these two files before touching any code:
+  cat OPERATOR_INSTRUCTIONS.md      ← project state, done/todo list, rules
+  cat docs/REQUIREMENTS_FINAL.md    ← complete feature spec (source of truth)
+
+Push command (use after every fix wave):
+  git add -A
+  git commit -m "Fix wave X.Y: [what changed]"
+  git push https://Niranjan2023kumar:$TOKEN@github.com/Niranjan2023kumar/ai-stock-app.git main
 
-══════════════════════════════════
-PRIME DIRECTIVE — NEVER BREAK EVER
-══════════════════════════════════
-
-RULE 1 — ZERO CRASHES (absolute):
-Every network call, DataStore read, .first(), database query, and any operation
-that can fail MUST be inside runCatching{ }.getOrElse{ fallback }.
-No !! force-unwrap on anything that came from the network or storage.
-No uncaught exceptions that reach the UI.
-Pattern: runCatching { dataStore.data.first() }.getOrElse { emptyValue }
-
-RULE 2 — REAL DATA ONLY (absolute):
-Yahoo Finance v8 ONLY: https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=1d
-Yahoo Finance v7 is DEAD (returns HTTP 401) — remove every v7 URL.
-Angel One SmartAPI: user enters credentials at runtime (Settings screen) — never hardcoded.
-AMFI mfapi.in: for mutual fund NAV — free, no key.
-ZERO dummy prices. ZERO hardcoded numbers shown to users. ZERO fake data.
-
-RULE 3 — PLAIN ENGLISH (absolute — zero jargon ever):
-Every string shown to users or spoken by TTS must pass the 12-year-old shopkeeper test.
-FORBIDDEN → USE INSTEAD:
-  stop-loss / stop loss      → safety stop
-  book profit                → take your profit
-  P&L                        → profit or loss
-  SIP (standalone)           → monthly investment
-  NAV (standalone)           → price per unit
-  CAGR                       → yearly growth
-  RSI / MACD / ATR           → describe in plain words or remove from user view
-  HOLD (verdict label)       → Watching
-  PASSED (verdict label)     → Too late
-  breakout                   → price jump (or "price broke higher")
-  square-off                 → the broker will close this at 3:20
-  bearish / bullish          → falling / rising
-  candlestick                → price chart
-  T1 / T2 / T3 (bare)        → Target 1 / Target 2 / Target 3
-  volatility (user-facing)   → the market is jumpy
-  ETF / index fund (card)    → "ready-made basket of top companies"
-  price band                 → "shares cost ₹X–₹Y each"
-  NOTE: field names and comments inside code can use technical terms —
-  ONLY user-visible strings (Text(), notification strings, TTS) must be plain.
-
-RULE 4 — APP DECIDES, USER OBEYS:
-Never show a raw number without a plain-English verdict next to it.
-User reads one sentence and acts — never guesses, never computes.
-
-RULE 5 — COMMIT AFTER EVERY PHASE, NOT AT THE END:
-git add -A && git commit -m "Wave [phase]: [what was done]"
-git push https://Niranjan2023kumar:YOUR_GITHUB_TOKEN@github.com/Niranjan2023kumar/ai-stock-app.git main
-After every push: call GitHub API to check build status. If FAILED: fix before continuing.
-Build check: curl -s -H "Authorization: token YOUR_GITHUB_TOKEN" "https://api.github.com/repos/Niranjan2023kumar/ai-stock-app/actions/runs?per_page=1"
-
-══════════════════════════════════
-PHASE 1 — SAFETY NET (fix before anything else)
-══════════════════════════════════
-Run each scan. Fix EVERY hit. Re-run scan. Zero hits expected before moving on.
-
-A) USER-FACING JARGON SCAN:
-grep -rn --include="*.kt" \
-  -e "\"stop-loss\"\|\"stop loss\"\|stop-loss\"\|safety stop" \
-  -e "book profit\|\"P&L\"\|\"SIP\"\|\"NAV\"\|\"RSI\"\|\"MACD\"" \
-  -e "candlestick\|square.off\|\"HOLD\"\|\"PASSED\"\|breakout" \
-  -e "bearish\|bullish" \
-  app/src/main/java notifications/src/main/java 2>/dev/null | \
-  grep -v "^.*\.kt:[0-9]*:.*//\|^.*\.kt:[0-9]*:[[:space:]]*//" | \
-  grep -v "val \|var \|fun \|class \|private\|internal\|data class" | \
-  grep -v "TODO\|NOTE:"
-
-For each hit in a user-visible string (Text(), SnackBar, notification title/body, TTS speakText):
-  Read the file. Fix using RULE 3 table. Verify no regression.
-
-Known remaining hits to fix:
-- SuggestionLedger.kt ~line 94: "touched the stop-loss" → "touched the safety stop"
-- LearningScreen.kt lesson titles: "What a stop-loss saves you" → "What a safety stop saves you"
-  LearningScreen.kt lesson body: every "stop-loss" in the body text → "safety stop"
-  LearningScreen.kt GlossaryTerm("RSI",...) and ("MACD",...) and ("Breakout",...):
-    These explain terms — keep the explanation but change the title:
-    "RSI" → "Tiredness meter" with explanation kept
-    "MACD" → "Trend change signal"
-    "Breakout" → "Price jump" (body keeps the explanation)
-- StockResearchScreen.kt ~line 73: "HOLD" -> verdict display → "Watching — keep if you own it"
-- StockResearchScreen.kt ~lines 550, 563: map "HOLD" display → "Watching"
-- StockResearchViewModel.kt ~line 278: "HOLD" → display as "Watching"
-- StockResearchViewModel.kt ~line 375: "(bullish)" → "(rising)" in displayed strings
-- StockResearchViewModel.kt ~line 377: "(bearish)" → "(falling)" in displayed strings
-- HindiTtsManager.kt ~line 188: Hindi TTS "stop-loss par aa gaya" → speak in plain English:
-  "Sell [symbol] now — it has reached your safety stop at [price] rupees. Open Groww and sell."
-  (Rule A4: TTS must match the screen — simple English, not Hindi)
-- TradingSignal.kt: bullishCase/bearishCase FIELD NAMES are internal — leave field names,
-  but in any place they're shown in a Text() composable, label them "Why it could rise" / "Why it could fall"
-
-B) CRASH SAFETY SCAN:
-grep -rn --include="*.kt" "\.first()" app/src notifications/src 2>/dev/null | grep -v "runCatching\|//"
-Wrap every hit: runCatching { theCall.first() }.getOrElse { defaultValue }
-Also check: grep -rn --include="*.kt" "\!\!" app/src notifications/src 2>/dev/null | grep -v "//"
-Replace every !! with safe alternative: ?: return or ?: emptyValue or let block.
-
-C) DEAD API SCAN:
-grep -rn --include="*.kt" "v7/finance\|query1.*v7\|query2.*v7" app/src notifications/src 2>/dev/null | grep -v "//"
-Replace with: https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=1d
-
-→ PUSH: "Phase 1: safety net — jargon/crash/dead-API sweep"
-→ VERIFY BUILD PASSES before Phase 2.
-
-══════════════════════════════════
-PHASE 2 — F1: MONEY LOOP (highest priority)
-══════════════════════════════════
-The full earning loop: App says BUY → user opens Groww → places order → confirms in app → app tracks.
-Files to modify: TradingScreen.kt, HomeScreen.kt, StockResearchScreen.kt, CommonComponents.kt
-
-F1.1 — GROWW DEEP-LINK BUTTON on every BUY/SELL card:
-  Add a composable GrowwButton(symbol: String) to CommonComponents.kt:
-  ```kotlin
-  @Composable
-  fun GrowwButton(symbol: String, modifier: Modifier = Modifier) {
-      val context = LocalContext.current
-      Button(
-          onClick = {
-              runCatching {
-                  val uri = android.net.Uri.parse("https://groww.in/stocks/$symbol")
-                  context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
-              }.onFailure {
-                  runCatching {
-                      val playStoreUri = android.net.Uri.parse("market://details?id=com.nextbillion.groww")
-                      context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, playStoreUri))
-                  }
-              }
-          },
-          modifier = modifier.fillMaxWidth(),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00D09C))
-      ) {
-          Text("Open Groww and place this order", color = Color.White, fontWeight = FontWeight.Bold)
-      }
-  }
-  ```
-  Add GrowwButton(signal.symbol) to every card that shows a BUY or SELL recommendation.
-
-F1.2 — ORDER TYPE LABEL — big, unmissable:
-  Add to every signal card: Text("INTRADAY order", style=MaterialTheme.typography.titleMedium, color=RedLight, fontWeight=FontWeight.Bold)
-  or Text("DELIVERY order", ..., color=GreenLight, ...) based on signal.intraday flag.
-
-F1.3 — "Order placed? Yes / No" confirm:
-  After GrowwButton tap: set a state flag orderPendingConfirm = true.
-  Show a dialog or card: "Did you place the order in Groww?"
-  Yes button: show a price-confirm dialog pre-filled with current live price.
-  User can adjust the fill price; on confirm → call tracker.addTrade(symbol, confirmedPrice, qty, stopLoss, target).
-  No button: dismiss.
-
-F1.4 — EXACT SHARE COUNTS per target (never "half"):
-  In every card showing targets, compute:
-    val sellAtT1 = (quantity * 0.5).toInt().coerceAtLeast(1)
-    val sellAtT2 = (quantity - sellAtT1).coerceAtLeast(0)
-  Display: "Sell $sellAtT1 shares at Target 1 (₹${fmtRs(signal.target1)})"
-           "Sell $sellAtT2 shares at Target 2 (₹${fmtRs(signal.target2)})"
-
-F1.5 — TODAY'S RUNNING P&L BAR — persistent at top of every tab:
-  Create a PnlBannerRow composable that reads the day's real P&L from TradeTrackerRepository.
-  Show: "Today: +₹350" (green) or "Today: −₹120" (red) or "Today: ₹0" (grey).
-  Place it above the content in HomeScreen, TradingScreen, and the Stock screen Scaffold.
-  Tap to show a breakdown card.
-
-→ PUSH: "Phase 2: F1 money loop — Groww button, order type, confirm, share counts, P&L bar"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 3 — F2: PROTECTION
-══════════════════════════════════
-
-F2.1 — REPEAT ALERTS (vibrating, 2–3 times):
-  In StockNotificationManager: when alertStopLossLive() or alertTargetLive() fires,
-  use a vibration pattern: longArrayOf(0, 500, 200, 500, 200, 1000).
-  Schedule a second alert 90 seconds later using WorkManager one-time task.
-  Cap at MAX 3 total fires per alert event.
-
-F2.2 — 3:15 PM ALARM for open intraday trades:
-  SquareOffAlarmReceiver already exists — verify it fires at exactly 15:15 IST.
-  Notification text: "Open Groww now and sell — the broker will close it automatically at 3:20 PM if you don't"
-  Vibration: longArrayOf(0, 1000, 500, 1000, 500, 2000) — strong, impossible to ignore.
-
-F2.3 — STALE ENTRY PROTECTION:
-  In every signal card composable that shows entry price and a BUY button:
-  If livePrice > signal.entryHigh * 1.005 (price already moved 0.5% past entry zone):
-    Replace the entire BUY section with:
-    Text("This chance has passed — do not buy now", color=RedLight, fontWeight=Bold)
-    Text("Wait for the next signal from the app", color=TextSecondary)
-    Hide the BUY button and all entry/target data (show only a "See history" collapse).
-  This check must run on every recomposition when livePrice updates.
-
-F2.4 — BATTERY / AUTOSTART SETUP GUIDE (first launch, one-time):
-  On first launch (DataStore flag firstLaunchDone = false):
-  Detect android.os.Build.MANUFACTURER.lowercase() and show brand-specific steps:
-    Xiaomi/Redmi/POCO → "Settings → App settings → Manage apps → [App] → Battery saver → No restrictions + Autostart ON"
-    Vivo → "Settings → Battery → Background power consumption → No restrictions + [App] set to allowed"
-    Oppo/Realme/OnePlus → "Settings → Battery → App power management → [App] → Allow background activity"
-    Samsung → "Settings → Apps → [App] → Battery → Unrestricted + Allow background activity"
-    Other → "Settings → Apps → [App] → Battery → No restriction"
-  Show as a simple card with "Got it" button → sets firstLaunchDone=true.
-  Re-check on every app resume: if battery saver is now enabled → show a warning banner.
-
-→ PUSH: "Phase 3: F2 protection — repeat alerts, 3:15 alarm, stale entry, battery guide"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 4 — F3: RIGHT PATH FOR USER'S MONEY
-══════════════════════════════════
-
-F3.1 — CAPITAL PATH RULE:
-  Read user's stated capital from DataStore (todayCapital).
-  In the main NavHost or MainScreen:
-    < ₹2,000: hide Intraday tab and Stock tab. Show only Mutual Fund tab + Guide tab.
-              Show card: "For ₹X, the safest way to earn is a monthly investment. See below."
-    ₹2,000–₹10,000: show Stock + MF + Guide tabs. Hide Intraday tab (or show as "Not recommended for this amount").
-    > ₹10,000: show all 4 tabs.
-  This check runs every time todayCapital changes.
-
-F3.2 — DAILY CHECK-IN "How much money today?":
-  On app open (once per calendar day, checked via DataStore lastCheckInDate):
-  Show a modal bottom sheet (not a blocking full screen) with:
-    Title: "How much will you invest today?"
-    Chips: ₹1,000 / ₹2,000 / ₹5,000 / ₹10,000 / Other / Skip
-    Other → number keyboard, max 7 digits
-    Skip → uses yesterday's amount
-  On confirm: store todayCapital in DataStore, dismiss sheet, trigger capital-path rule.
-  Show tappable chip at top of every tab: "Today: ₹5,000 — tap to change"
-
-F3.3 — BUDGET-FIT FILTER:
-  In IntradayRepository and stock pick generation:
-  Filter out any signal where signal.entryPrice * minimumQuantity > todayCapital.
-  If fewer than 4 picks remain: show "Only X good stocks fit your money today" honestly.
-
-→ PUSH: "Phase 4: F3 capital path, daily check-in, budget filter"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 5 — F4: PROFIT COMPLETERS
-══════════════════════════════════
-
-F4.1 — "MY STOCKS" DAILY HOLD/SELL VERDICTS:
-  In HomeScreen or Stock tab: add a "My Stocks" section.
-  For each open delivery trade from TradeTrackerRepository (where !trade.intraday):
-    Fetch live price.
-    Compute verdict:
-      price >= trade.target1 → "Sell today — target reached. Open Groww and sell."
-      price <= trade.stopLoss → "Sell today — safety stop hit. Open Groww and sell now."
-      trend is down (price < 5-day avg and falling) → "Sell today — signs of falling, protect your profit"
-      else → "Still watching — target ₹${fmtRs(trade.target1)} is ahead"
-    Show each as a card with stock name, verdict, Groww button.
-    Sell verdicts trigger a notification + Groww button.
-
-F4.2 — SIP REMINDER + AMFI GROWTH LINE:
-  SipReminderWorker already fires on the SIP date — verify its notification text says
-  "Today is your monthly investment day — was ₹X invested? Yes / No"
-  Add AMFI NAV growth line to the Mutual Fund screen:
-    Fetch: https://api.mfapi.in/mf/{schemeCode}/latest — free, no key
-    Show: "Your ₹12,000 invested so far is now worth ₹13,100 (+9%) — an estimate from official data"
-    All inside runCatching{ }.getOrElse{ null } — hide if data unavailable.
-
-F4.3 — WEEKLY LOSS LIMIT:
-  In TradeTrackerRepository: add weeklyPnl calculation (sum of all trades closed this Mon–Sun).
-  In DataStore: store weeklyLossLimit (default: 5% of user's stated capital, auto-computed).
-  When weeklyPnl < -weeklyLossLimit:
-    In every trading tab: replace recommendations with a card:
-    "Enough for this week — the app is protecting your money. Start fresh next Monday."
-    Voice: "Enough for this week. Come back next Monday."
-    SIP and Gold/ETF suggestions stay visible — saving is always allowed.
-
-→ PUSH: "Phase 5: F4 My Stocks verdicts, SIP reminder+AMFI, weekly loss limit"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 6 — F5: PRACTICE MODE
-══════════════════════════════════
-
-F5.1 — PRACTICE MODE:
-  Add practiceMode: Boolean flag to TradeTrackerRepository (DataStore backed).
-  In every trade card: if practiceMode=true, show a bold amber banner "PRACTICE — virtual money only"
-  Practice P&L tracked completely separately from real P&L.
-  In PnlBannerRow: show "Practice: +₹350" in amber, never mixed with real P&L.
-  Real trade buttons disable in practice mode, replaced with "Practice Buy"/"Practice Sell".
-  In OutcomeRecorder: skip recording practice trades (already done — verify).
-
-F5.2 — FIRST LAUNCH FLOW:
-  On very first launch (DataStore flag onboardingDone=false):
-  Show one simple screen:
-    Title: "Do you have a Groww account?"
-    "Yes, I have one" → set onboardingDone=true, go to main app (real mode)
-    "No, not yet" → show 3 plain steps:
-      1. Search "Groww" in Play Store and install it (10 seconds)
-      2. Sign up with your phone number and PAN card (takes 1–2 days to verify)
-      3. Meanwhile, use PRACTICE mode — earn with virtual money while you wait
-      → "Start Practice Mode" button → set onboardingDone=true, practiceMode=true, go to app
-  Never show this screen again after onboarding is done.
-
-→ PUSH: "Phase 6: F5 Practice Mode + first launch flow"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 7 — F6: SIMPLER UI
-══════════════════════════════════
-
-F7.1 — HIDE REMOVED SCREENS from navigation:
-  Remove nav graph entries for:
-    Backtesting screen, Sector Rotation screen, Market Breadth screen,
-    standalone News screen, Portfolio screen, Dashboard screen, Recommendations screen.
-  Do NOT delete the classes — just remove their routes from NavHost so users cannot navigate there.
-  Remove any bottom nav items or menu items that lead to these.
-
-F7.2 — CONTEXTUAL NEWS:
-  News should appear only inside the card it belongs to, not in a separate screen.
-  Stock tab: show top 2–3 news headlines inside each pick card under "See more".
-  Intraday tab: show "Because of this news:" inside the intraday signal card.
-  Source: Yahoo Finance news endpoint (already in IntradayRepository).
-  All inside runCatching{ }.getOrElse{ emptyList() }.
-
-F7.3 — REPORT CARD LINE (honest, real data from SuggestionLedger):
-  In HomeScreen or Stock tab top section:
-  Read real data from SuggestionLedger (already exists).
-  Show: "This week: X right, Y wrong — total +₹Z" OR "−₹Z"
-  ONLY show if there is real data. Never invent numbers. If no data yet: omit the line entirely.
-
-F7.4 — AFTER-LOSS TRUST CARD (verify it's working):
-  OutcomeRecorder.afterLossInfo() already returns the message.
-  Verify it shows: "Your safety stop worked on [stock] — it closed the trade at a ₹X loss,
-  instead of a bigger loss. The system is working. Tomorrow is a new day."
-  Show this card on HomeScreen for losses that happened today only.
-
-F7.5 — "SAVING IS EARNING" CARD:
-  When no signals are available (bad market day, after loss limit, market closed):
-  Show a card: "Buy nothing today — keeping your money safe IS today's earning."
-  Voice: same sentence.
-  Style: card with TextPrimary, not red (this is a positive message, not an error).
-
-→ PUSH: "Phase 7: F6 simpler UI — hide removed screens, contextual news, report card"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 8 — F7: MORE WAYS TO EARN (Guide tab Advanced section)
-══════════════════════════════════
-All of this lives in the Guide tab (TAB 4) under an "Advanced" / "More ways to earn" section.
-These are REAL implementations using free public data — no dummy data, no placeholders.
-
-F8.1 — GOLD / SILVER VERDICT CARD:
-  Fetch via Yahoo Finance v8:
-    Gold: symbol "GC=F" → https://query2.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=200d
-    Silver: symbol "SI=F" → same pattern
-  Compute: current price vs 200-day average (average of last 200 daily closes).
-  Verdict rule:
-    price < 200-day avg × 0.98 → "Gold is cheap now — good time to buy a little"
-    price > 200-day avg × 1.05 → "Gold is costly now — wait for a better price"
-    else → "Gold is near its average price — buy a small amount to start"
-  Show price in ₹ (convert from USD using Yahoo Finance INR=X exchange rate).
-  Pre-compute: "Put ₹500 in gold this month via Groww"
-  Add GrowwButton with symbol "GOLDBEES" (largest gold ETF on NSE).
-  Wrap everything in runCatching{ }.getOrElse{ null } — hide card if data unavailable.
-
-F8.2 — IPO ALERTS:
-  Source: https://www.nseindia.com/api/allIpo — free public API
-  Show upcoming + currently open IPOs.
-  For each IPO:
-    Date in plain words: "Opens [date] — closes [date]"
-    Price: "Each share costs ₹X to ₹Y" (never "price band")
-    Min investment: "You need ₹X for one lot"
-    Affordability: compare to todayCapital → show "This fits your money" or "This needs more money than you have set aside"
-    Verdict: "APPLY" (only if affordable) or "SKIP — not enough for one lot"
-  Wrap in runCatching{ }.getOrElse{ emptyList() } — if NSE API unavailable, hide section.
-
-F8.3 — ETF / INDEX SIP CARD:
-  Default recommendation: Nippon India Nifty 50 Index Fund (scheme code: 118825)
-  Show: "One fund that owns India's 50 biggest companies — put ₹X every month"
-    X = max(500, todayCapital / 10) rounded to nearest 500
-  Track units via AMFI NAV: https://api.mfapi.in/mf/118825/latest
-  Show growth line if user has invested: "Your ₹X is now ₹Y (+Z%)"
-  GrowwButton with Nippon India Nifty 50 search.
-
-F8.4 — MARKET-CLOSED SCREEN:
-  When isMarketHours() = false:
-  Show a card at top of Stock and Intraday tabs:
-    Countdown: "Market opens in X hours Y minutes"
-    What IS available now:
-      Night (8 PM – 4 AM IST): "US stocks are trading now — see below"
-      Evening: "Gold price right now: ₹X — the app's verdict: [verdict from F8.1]"
-      Any time: open IPOs from F8.2
-  Countdown updates every minute via LaunchedEffect.
-
-F8.5 — US STOCKS (Guide tab, Advanced, shown at night IST):
-  Symbols: AAPL, MSFT, GOOGL, AMZN, TSLA, META, NVDA
-  Fetch via Yahoo Finance v8 for each symbol.
-  Convert price to ₹: multiply by USD/INR rate from Yahoo Finance "INR=X" symbol.
-  Apply same signal engine as Indian stocks (trend + momentum + 52-week position).
-  Verdict: same BUY/WAIT format, price shown in ₹.
-  Show ONLY during US market hours (9:30 AM–4 PM EST = 7 PM–1:30 AM IST).
-  If user's broker cannot buy US stocks: show verdict as "WATCH only — buying US stocks needs a special account"
-
-→ PUSH: "Phase 8: F7 Gold/Silver, IPO, ETF, market-closed screen, US stocks"
-→ VERIFY BUILD PASSES.
-
-══════════════════════════════════
-PHASE 9 — FULL CODE AUDIT (zero tolerance)
-══════════════════════════════════
-This phase finds and fixes anything missed. Run every check to completion.
-
-AUDIT A — JARGON ZERO-TOLERANCE:
-grep -rn --include="*.kt" \
-  -e "stop.loss\|stop-loss" -e "book profit" -e '"P.L"' \
-  -e '"SIP"' -e '"NAV"' -e '"RSI"' -e '"MACD"' \
-  -e "candlestick\|square.off\|breakout\|bearish\|bullish" \
-  -e '"HOLD"' -e '"PASSED"' -e "volatility" \
-  app/src/main/java notifications/src/main/java 2>/dev/null | \
-  grep -v "val \|var \|fun \|class \|private\|//\|TODO\|field\|property"
-Expected: ZERO hits in any user-visible string.
-Fix every remaining hit.
-
-AUDIT B — CRASH-PROOF ZERO-TOLERANCE:
-grep -rn --include="*.kt" "\.first()" app/src notifications/src 2>/dev/null | grep -v "runCatching\|//"
-grep -rn --include="*.kt" "\!\!" app/src notifications/src 2>/dev/null | grep -v "//"
-grep -rn --include="*.kt" "throw [A-Z]" app/src notifications/src 2>/dev/null | grep -v "//"
-Expected: ZERO in production paths.
-
-AUDIT C — DUMMY DATA ZERO-TOLERANCE:
-grep -rn --include="*.kt" -e "dummy\|fake\|placeholder\|hardcoded\|TODO\|FIXME\|12345\|99999" \
-  app/src notifications/src 2>/dev/null | grep -v "//"
-Expected: ZERO.
-
-AUDIT D — DEAD API ZERO-TOLERANCE:
-grep -rn --include="*.kt" "v7/finance" app/src notifications/src 2>/dev/null | grep -v "//"
-Expected: ZERO.
-
-AUDIT E — EMPTY STATES (spot-check):
-Search for any LazyColumn or Column that could render empty with no message shown.
-Every empty state must say WHY in one line and what IS available now.
-
-AUDIT F — BUILD MUST PASS:
-Check GitHub Actions latest run via API.
-If failed: read logs, fix root cause, push fix, verify build passes.
-
-→ PUSH: "Phase 9: full audit complete — zero jargon, zero crashes, zero dead APIs"
-
-══════════════════════════════════
-PHASE 10 — UPDATE THE BRAIN
-══════════════════════════════════
-In OPERATOR_INSTRUCTIONS.md:
-Mark every item you implemented as [x] done.
-Add a note of what files changed for each item.
-Update the "WHAT HAS BEEN DONE" section.
-This file is read by the automated agents every 2h — keep it accurate.
-
-→ PUSH: "Phase 10: OPERATOR_INSTRUCTIONS.md updated — build checklist current"
-
-══════════════════════════════════
-FINAL REPORT
-══════════════════════════════════
-Tell me:
-1. Every phase completed ✓
-2. Every file changed and what changed
-3. All 4 audit checks: ZERO hits confirmed
-4. GitHub Actions build: PASSING
-5. APK link: https://github.com/Niranjan2023kumar/ai-stock-app/releases/latest
-6. Say: "Download APK → install → open → within 10 seconds, any first-time user knows
-         exactly what to do — in plain English, with one tap to Groww."
-
-══════════════════════════════════
-WHEN STUCK RULE (never freeze)
-══════════════════════════════════
-If an external API (NSE IPO, AMFI, etc.) is down or unreliable:
-  → implement with graceful fallback (hide section, show "data will appear when available")
-  → document in code comment what API was tried
-  → move to next phase
-If a feature needs code that doesn't compile:
-  → check existing code patterns in the same file
-  → simplify the implementation to match what compiles
-  → never leave a broken build
-If unsure about an implementation:
-  → read docs/REQUIREMENTS_FINAL.md for the exact spec
-  → implement the simplest version that satisfies the requirement
-  → commit and move on
-
-START NOW. Phase 0 → Phase 1 → Phase 2 → ... → Phase 10.
-Never stop. Never ask. Build. Fix. Push. Verify. Repeat.
 ════════════════════════════════════════════════════════
+SECTION 3: THE FIVE LAWS — NEVER BREAK
+════════════════════════════════════════════════════════
+
+LAW 1 — ZERO CRASHES (absolute priority #1):
+  Every network call, DataStore read, .first(), JSON parse, and anything
+  that can throw MUST be inside runCatching{}.getOrElse{ safeDefault }.
+  No !! force-unwrap anywhere in production paths. Zero uncaught exceptions.
+  Pattern: runCatching { dataStore.data.first() }.getOrElse { defaultValue }
+
+LAW 2 — REAL DATA ONLY (absolute priority #2):
+  Yahoo Finance v8 ONLY: https://query2.finance.yahoo.com/v8/finance/chart/SYMBOL?interval=1d&range=1d
+  Yahoo Finance v7 is DEAD (HTTP 401) — delete any v7 URL found.
+  Angel One SmartAPI: user enters credentials at runtime. Never hardcoded.
+  AMFI mfapi.in: free mutual fund NAV — https://api.mfapi.in/mf/{schemeCode}/latest
+  ZERO dummy prices. ZERO placeholders. ZERO fake/invented data ever shown to users.
+
+LAW 3 — ZERO JARGON (every user-facing string):
+  Test: can a 12-year-old shopkeeper understand it?
+  FORBIDDEN → REPLACEMENT:
+    stop-loss / stop loss    → safety stop
+    book profit              → take your profit
+    P&L                      → profit or loss
+    SIP (badge/standalone)   → monthly investment
+    NAV                      → price per unit
+    CAGR                     → yearly growth
+    RSI / MACD / ATR         → describe plainly or remove from user view
+    HOLD (verdict badge)     → Watching
+    PASSED (verdict badge)   → Too late
+    breakout                 → price jump
+    square-off               → close the trade (or "broker closes it")
+    candlestick              → price chart bar
+    T1/T2/T3 (bare labels)   → Target 1 / Target 2 / Target 3
+    bearish / bullish        → falling / rising
+    volatility (user-facing) → the market is jumpy
+    ETF (user-facing card)   → ready-made basket of top companies
+    NOTE: code field names (stopLoss, bullishCase) can stay technical —
+    ONLY Text(), TTS speakText(), notification title/body must be plain.
+
+LAW 4 — APP NEVER TRADES:
+  The app ONLY advises. Real buying/selling happens in Groww.
+  Never place orders. Never touch user money. Just open Groww for the user.
+
+LAW 5 — FAST AND FREE APIs ONLY:
+  Free and fast: Yahoo Finance v8 (no key), AMFI mfapi.in (no key),
+                 NSE public APIs (no key), Angel One SmartAPI (user's key).
+  Never add a paid API. Never block on a slow API. Always async + timeout.
+  If an API is slow (>3s): show cached data + "Refreshing…" spinner.
+  If an API fails: hide that section + log the error — never crash or show error to user.
+
+════════════════════════════════════════════════════════
+SECTION 4: CODE STRUCTURE (where everything is)
+════════════════════════════════════════════════════════
+
+app/src/main/java/com/example/myapplication3/
+  ui/screen/          → All 4 main tab screens + subscreen
+  ui/viewmodel/       → InterdayViewModel (main), MutualFundsViewModel, etc.
+  ui/component/       → CommonComponents.kt, GrowwAction.kt, TodayPnlBar.kt
+  tracking/           → TradeWatchService, SquareOffAlarmReceiver, BatteryGuard
+  intraday/           → IntradayRepository (Yahoo v8), SignalEngine, TradingSignal.kt
+  mutualfunds/        → MutualFundRepository, SipReminderWorker
+  ledger/             → SuggestionLedger (tracks pass/fail per suggestion)
+  tts/                → HindiTtsManager (TTS — ENGLISH ONLY, Law 3)
+  notifications/src/  → StockNotificationManager (all push alerts)
+
+4 main tabs (bottom nav):
+  Stock tab   = HomeScreen.kt
+  Intraday    = TradingScreen.kt
+  Mutual Fund = MutualFundsScreen.kt
+  Guide       = LearningScreen.kt
+
+════════════════════════════════════════════════════════
+SECTION 5: CURRENT STATE (as of 2026-08-13)
+════════════════════════════════════════════════════════
+
+DONE — do NOT redo these:
+  ✅ Fix waves v1.1–v1.8: full jargon sweep, crash safety, dead API removal
+  ✅ GitHub Actions CI: auto-build APK on every push → releases/latest
+  ✅ stop-loss → safety stop in ALL user-facing strings
+  ✅ bearish/bullish → falling/rising in StockResearchViewModel
+  ✅ HindiTtsManager: all TTS is plain English (no Hindi speech)
+  ✅ HOLD badge → "Watching"; PASSED → "Too late"
+  ✅ F1.1: Groww deep-link on every BUY card (GrowwActionRow in GrowwAction.kt)
+  ✅ F1.2: INTRADAY/DELIVERY order type label on every BUY card
+  ✅ F1.3: "Order placed? Yes/No" confirm on return from Groww
+  ✅ F1.4: Per-target exact share counts (computeTargetSplit in GrowwAction.kt)
+  ✅ F1.5: TodayPnlBar on all 4 main tabs
+  ✅ F2.1: Vibrating repeat alerts (vibrateStrong in NotificationManager)
+  ✅ F2.2: 3:15 PM square-off alarm (SquareOffAlarmReceiver)
+  ✅ F2.3: Stale-entry protection (buyChancePassed in TradingScreen + HomeScreen)
+  ✅ F2.4: Battery/autostart guide (BatteryGuard + HomeScreen)
+  ✅ F3.1: Capital-path rule (capitalPathFor — SIP_ONLY/DELIVERY/FULL)
+  ✅ F3.2: Daily "How much money today?" check-in
+  ✅ F3.3: Budget-fit filter (never shows unaffordable stocks)
+  ✅ F4.1: My Stocks daily verdicts (MyStockCard in CommonComponents.kt)
+  ✅ F4.3: Weekly loss limit
+  ✅ F5.1: Practice Mode (labeled PRACTICE, never mixed with real)
+
+STILL TO DO (work in this exact order):
+  → F4.2: SIP reminder notification + AMFI growth line
+  → F6.3: "This week's report" card on HomeScreen (from SuggestionLedger)
+  → F6.1: Hide unused screens (Backtesting, Sector, Breadth, etc.) from nav
+  → F7.1: Gold/Silver verdict card in MoreWaysScreen
+  → F7.3: ETF/Index SIP card
+  → F7.2: IPO alerts
+  → F5.2: "Open Groww account" first-launch flow
+  → F8.2: 10-second test (audit OneDecisionCard in HomeScreen)
+  → Full jargon + crash + dead-API audit scan
+
+════════════════════════════════════════════════════════
+SECTION 6: WHAT TO DO (full implementation plan)
+════════════════════════════════════════════════════════
+
+Work in this order. Commit after every item. Push every commit.
+
+── STEP 1: START WITH AUDIT ──────────────────────────
+Run these scans FIRST. Fix every hit before implementing anything new.
+
+Jargon scan (all user-visible strings):
+  grep -rn --include="*.kt" \
+    -e "stop.loss\|stop-loss" -e "book profit" -e '"P.L"' \
+    -e '"SIP"' -e '"NAV"' -e '"RSI"' -e '"MACD"' \
+    -e "candlestick\|square.off\|bearish\|bullish" \
+    -e '"HOLD"' -e '"PASSED"' -e "breakout" \
+    app/src notifications/src 2>/dev/null | \
+    grep 'Text(\|speakText\|setContentTitle\|setContentText\|title =\|body ='
+
+Crash safety scan:
+  grep -rn --include="*.kt" "\.first()" app/src notifications/src 2>/dev/null | \
+    grep -v "runCatching\|firstOrNull\|//"
+
+Dead API scan:
+  grep -rn --include="*.kt" "v7/finance" app/src notifications/src 2>/dev/null | grep -v "//"
+
+Fix EVERY hit → commit "Audit fix: [what was fixed]" → push.
+
+── STEP 2: F4.2 — SIP REMINDER NOTIFICATION ─────────
+File to check: mutualfunds/SipReminderWorker.kt
+Verify the notification it sends says:
+  Title: "Monthly investment day"
+  Text:  "Today is your monthly investment day. Open the Mutual Fund tab."
+  (No "SIP", no "NAV", no jargon — Law 3)
+Then add AMFI NAV growth line to MutualFundsScreen.kt's SIP detail section:
+  URL: https://api.mfapi.in/mf/{schemeCode}/latest
+  If user has SIP records: compute total invested vs current NAV value.
+  Show: "Your ₹12,000 monthly investment is now worth ₹13,100 — up 9%"
+  All inside runCatching{}.getOrElse{ null } — hide completely if unavailable.
+Commit: "F4.2: SIP reminder wording fix + AMFI growth line"
+
+── STEP 3: F6.3 — "THIS WEEK'S REPORT" CARD ─────────
+File: ledger/SuggestionLedger.kt — already tracks pass/fail per suggestion.
+In HomeScreen.kt, after the "Your stocks" section, add:
+  Read SuggestionLedger.getThisWeekStats() (implement if not there):
+    Data: count of pass (target reached), fail (safety stop hit), pending.
+    Total realized P&L for the week.
+  Show card ONLY when count > 0:
+    "This week: X trades made, Y reached target, Z hit safety stop"
+    "Total this week: +₹X" (green) or "−₹X" (red)
+  Plain English. No jargon. No bare numbers without labels.
+Commit: "F6.3: weekly report card on HomeScreen"
+
+── STEP 4: F6.1 — HIDE UNUSED SCREENS ───────────────
+File: navigation/AppNavigation.kt
+Check which routes exist beyond the 4 bottom-nav tabs.
+Remove (don't delete code, just remove from NavHost composable):
+  Routes for: Backtesting, SectorRotation, MarketBreadth, PortfolioScreen,
+              DashboardScreen, RecommendationsScreen, standalone NewsScreen.
+These screens cause confusion for zero-knowledge users. The 4 tabs are enough.
+Any useful content from these screens should move to the Guide tab's Advanced section.
+Commit: "F6.1: remove unused screens from navigation"
+
+── STEP 5: F7.1 — GOLD VERDICT CARD ─────────────────
+File: ui/screen/MoreWaysScreen.kt (already exists, check for gold card)
+If not already there, add a GoldVerdictCard composable:
+
+  Fetch: https://query2.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=200d
+  Parse: extract last 200 daily closing prices from chart > result[0] > indicators > quote[0] > close
+  Compute ma200 = average of last 200 closes
+  Fetch USD/INR: https://query2.finance.yahoo.com/v8/finance/chart/INR%3DX?interval=1d&range=1d
+  Convert gold price to ₹: currentPriceUSD * usdInr
+
+  Verdict (all inside runCatching):
+    currentPrice < ma200 * 0.98 → "Gold is below its long-term average — a good time to buy a little"
+    currentPrice > ma200 * 1.05 → "Gold is above its long-term average — wait for a better price"
+    else                        → "Gold is near its average price — a small amount is fine"
+
+  Show:
+    "Gold today: ₹{price} per gram (approx.)"
+    The verdict sentence.
+    "Add gold every month via Groww" button → GrowwLauncher.openStock(ctx, "GOLDBEES")
+    "This is a rough estimate — gold prices change throughout the day."
+
+  All in runCatching. If any fetch fails: hide card entirely, don't show error.
+Commit: "F7.1: Gold verdict card with 200-day average rule"
+
+── STEP 6: F7.3 — ETF / INDEX SIP CARD ──────────────
+In MoreWaysScreen.kt, add an ETF SIP card:
+  NAV fetch: https://api.mfapi.in/mf/118825/latest  (Nippon India Nifty 50 Index Fund)
+  Show: "One fund that owns India's 50 biggest companies"
+       "Put ₹500 every month — the app suggests ₹{max(500, capital/10)} based on your money"
+       Current NAV: "Today's price: ₹{nav} per unit"
+  If user has a SIP record for this fund: show growth line (same as Step 2).
+  GrowwButton → search "Nippon India Nifty 50 Index Fund" in Groww
+  All in runCatching. Hide if unavailable.
+Commit: "F7.3: ETF/Index SIP card"
+
+── STEP 7: F7.2 — IPO ALERTS ────────────────────────
+In MoreWaysScreen.kt, add an IPO section:
+  Fetch: https://ipowatch.in/api/ipo-status/open  (or NSE public API if available)
+  If that fails, try: https://www.chittorgarh.com/report/ipo-subscription-status-today/93/
+  IMPORTANT: Wrap ALL of this in runCatching. If no data: hide section entirely.
+  For each open IPO (max 3 shown):
+    Name in plain English (no stock exchange codes)
+    "Each share costs ₹X to ₹Y" (parse from price band — never show "price band")
+    "You need ₹X for one lot" (compute: lotSize × issuePrice)
+    Date: "Open until [date in plain words like 'Thursday 14 August']"
+    If affordable (requiredAmount <= todayCapital):
+      APPLY button → opens Groww search for the IPO name
+    If not affordable:
+      Grey text: "This needs ₹X — more than your daily budget"
+  If no open IPOs: hide section (don't say "no IPOs").
+Commit: "F7.2: IPO alerts in MoreWaysScreen"
+
+── STEP 8: F5.2 — FIRST LAUNCH GROWW ONBOARDING ─────
+File: navigation/AppNavigation.kt OR MainActivity.kt
+On very first launch (DataStore flag "onboarding_done" = false):
+  Show a screen (can be a composable overlay or full screen):
+    Large simple text: "Do you have a Groww account?"
+    Two buttons:
+      "Yes, I have Groww" → set onboarding_done=true → open main app (real mode)
+      "Not yet" → show 3 plain steps:
+        "1. Search 'Groww' in Play Store and install"
+        "2. Sign up — takes 1–2 days to verify your PAN card"
+        "3. While you wait: use Practice Mode — earn with virtual money"
+        Big button: "Start with Practice Money" → set onboarding_done=true,
+                    practiceMode=true, go to main app
+  Never show this screen again after onboarding_done=true.
+Commit: "F5.2: first launch Groww onboarding flow"
+
+── STEP 9: F8.2 — 10-SECOND TEST ────────────────────
+Open HomeScreen.kt. Read the OneDecisionCard composable (the main decision card).
+Ask: can a person who NEVER saw a stock market understand what to do in 10 seconds?
+The card MUST show, in this exact order:
+  1. Action: "BUY" (green) or "Wait — no good trade today" (neutral)
+  2. Stock name: plain, no .NS suffix shown
+  3. How much: "Spend about ₹X — you can buy Y shares"
+  4. After-charges profit: "Profit after charges: about +₹Z"
+  5. Safety stop: "Sell if it falls to ₹W (safety stop)"
+  6. ONE button: "Place order in Groww" (only if action = BUY)
+If anything is in wrong order, unclear, or uses jargon: fix it.
+No raw numbers without labels. No jargon. One decision. One button.
+Commit: "F8.2: 10-second test — OneDecisionCard clarity"
+
+── STEP 10: FULL FINAL AUDIT ─────────────────────────
+Run all 4 scans from Step 1 again. Fix every remaining hit.
+Check every screen file for:
+  □ Empty states: every "nothing to show" has a helpful plain message
+  □ Loading states: every spinner has a timeout fallback (no infinite spinner)
+  □ Error states: no raw exception text shown to users
+  □ All TTS speakText() calls use plain English (grep all speakText calls)
+  □ All notification title/body use plain English
+  □ Groww button present on every card with a BUY recommendation
+
+Commit: "Final audit: zero jargon, zero crashes, zero dead APIs confirmed"
+
+── STEP 11: UPDATE THE BRAIN ─────────────────────────
+Read OPERATOR_INSTRUCTIONS.md.
+Check every unchecked item that you just implemented.
+Update "Last updated" date.
+Commit: "OPERATOR_INSTRUCTIONS.md: all done items marked, ready for next session"
+
+════════════════════════════════════════════════════════
+SECTION 7: WHEN STUCK — NEVER FREEZE
+════════════════════════════════════════════════════════
+
+If an API returns no data:
+  → Implement with graceful fallback: hide the section, don't show error to user
+  → Add code comment: // API TRIED: [url] — hidden when unavailable
+
+If code won't compile:
+  → Read existing patterns in the same file
+  → Simplify to match what already compiles
+  → Never leave a broken state
+
+If a feature's spec is unclear:
+  → Read docs/REQUIREMENTS_FINAL.md for the exact spec
+  → Implement the simplest version that satisfies it
+  → Commit and move on
+
+If a build fails on GitHub Actions:
+  → Read the error log via API: curl -s -H "Authorization: token $TOKEN" \
+     "https://api.github.com/repos/Niranjan2023kumar/ai-stock-app/actions/runs?per_page=1"
+  → Fix the root cause (usually: Windows-specific gradle.properties lines still present,
+    or a missing permissions: contents: write on the release step)
+  → Never push broken code — always verify the build passes
+
+════════════════════════════════════════════════════════
+SECTION 8: DEFINITION OF DONE
+════════════════════════════════════════════════════════
+
+The project is done when someone who has NEVER seen a stock market opens
+the app on their phone and within 10 seconds — without thinking — knows:
+  • What to buy (or "don't buy today") in one plain sentence
+  • How many shares + how much it costs
+  • How much profit to expect (after charges)
+  • Where the safety stop is
+  • ONE button: "Place order in Groww"
+
+All in simple English. With a voice option. The app silently protects them
+from: wrong order type, stale signals, unaffordable stocks, loss limits,
+missed 3:15 PM square-off. Zero jargon. Zero crashes. Zero fake data.
+
+APK download: https://github.com/Niranjan2023kumar/ai-stock-app/releases/latest
+
+════════════════════════════════════════════════════════
+SECTION 9: VERIFY SUCCESS
+════════════════════════════════════════════════════════
+
+After every push, check the build:
+  curl -s "https://api.github.com/repos/Niranjan2023kumar/ai-stock-app/actions/runs?per_page=1" \
+    -H "Authorization: token YOUR_GITHUB_TOKEN_HERE" \
+    -H "Accept: application/vnd.github.v3+json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r=d['workflow_runs'][0]
+print(r['status'],r['conclusion'],r['html_url'])
+"
+
+Download + install APK:
+  https://github.com/Niranjan2023kumar/ai-stock-app/releases/latest
+
+Signs of success on the phone:
+  ✓ Opens without crash
+  ✓ Within 10 seconds: sees one stock + BUY/WAIT verdict
+  ✓ Zero jargon (no stop-loss, no RSI, no SIP badge, no bullish)
+  ✓ "Open Groww" button visible only on real BUY signals
+  ✓ P&L bar at top of all 4 tabs
+  ✓ 3:15 PM alarm fires if intraday trade is open
+
+Signs of bugs to fix immediately:
+  ✗ Any crash or "Unfortunately, app has stopped"
+  ✗ "stop-loss" or "SIP" visible anywhere as a badge/label
+  ✗ Same price never changes (stale cache not refreshing)
+  ✗ "Null" or "null" visible anywhere
+  ✗ Empty screen with no explanation
+  ✗ Infinite loading spinner
+
+════════════════════════════════════════════════════════
+START NOW. Step 1 → Step 11. Commit after each step. Push every commit.
+Never stop. Build. Fix. Push. Verify. Repeat until all steps are done.
+Token: YOUR_GITHUB_TOKEN_HERE
+================================================================================
