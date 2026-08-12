@@ -101,11 +101,11 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 ---
 
 ## WHAT HAS BEEN DONE (do not redo)
-- [x] Fix waves v1.1–v1.7: full jargon sweep, crash safety, dead API removal
+- [x] Fix waves v1.1–v1.9: full jargon sweep, crash safety, dead API removal
 - [x] GitHub Actions CI: builds APK on every push, releases/latest always has latest APK
 - [x] "stop-loss" → "safety stop" in ALL user-facing strings, TTS, notifications, OutcomeRecorder, LearningScreen
 - [x] "book profit" → "take your profit"
-- [x] "SIP" → "monthly investment" in user-facing strings
+- [x] "SIP" → "monthly investment" in ALL user-facing strings (HomeScreen, MutualFundsScreen, LearningScreen, notifications)
 - [x] PASSED verdict → "Too late" in CommonComponents
 - [x] HOLD → "Checking the price…" / "Watching this for you" / "Still watching" / "Watching" badge
 - [x] "(bullish)"/"(bearish)" → "(rising trend)"/"(falling trend)" in StockResearchViewModel
@@ -122,56 +122,64 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 - [x] F1.2: INTRADAY/DELIVERY order type label on every BUY card (GrowwActionRow)
 - [x] F1.3: "Order placed? Yes/No" confirm on return from Groww (GrowwActionRow + PendingOrderConfirmDialog)
 - [x] F1.4: Per-target exact share counts (computeTargetSplit() in GrowwAction.kt)
+- [x] F1.5: TodayPnlBar on all 4 main tabs (Home, Trading, MutualFunds, Learning)
+- [x] F2.1/F2.2/F2.4: Vibrating alerts, 3:15 PM alarm, BatteryGuard — all in notification layer
 - [x] F2.3: Stale-entry protection — buyChancePassed() used in TradingScreen + HomeScreen; "From yesterday" cache invalidation in IntradayRepository
+- [x] F4.2: AMFI growth line in MutualFundsScreen (real NAV data from mfapi.in); "SIP" jargon sweep in that screen; SipReminderWorker wording already clean
+- [x] F5.1: Practice Mode (labeled PRACTICE, never mixed with real)
+- [x] F5.2: First-launch Groww onboarding — "Do you have Groww?" Yes→real mode, No→3-step setup+Practice Money
+- [x] F6.1: Unused screens (Backtesting, Sector, Breadth, etc.) already removed from navigation
+- [x] F6.3: Weekly report card on HomeScreen (WeeklyReportLine + TradeTrackerRepository); thisWeekStats() added to SuggestionLedger for suggestion-level pass/fail
+- [x] F7.1: Gold/Silver verdict card in MoreWaysScreen (GOLDBEES.NS, SILVERBEES.NS via Yahoo v8, 200-day MA rule)
+- [x] F7.2: IPO alerts in MoreWaysScreen (NseRepository.fetchIpos, affordability check)
+- [x] F7.3: ETF/Index SIP card in MoreWaysScreen (IndexSipCard, UTI Nifty 50)
+- [x] F8.2: OneDecisionCard 10-second order — BUY→stock name→spend→profit→safety stop→button; "SIP" swept from HomeScreen
 
 ---
 
-## BUILD ORDER — WHAT TO DO NEXT
-Work through these IN ORDER. One item per wave. Update this file after each item.
+## BUILD ORDER — CURRENT STATE (as of 2026-08-13)
+Most features are done. Remaining work listed below.
 
-### F1 — Money loop ✅ MOSTLY DONE
-- [x] **F1.1** Groww deep-link button on every BUY card (GrowwActionRow in GrowwAction.kt)
-- [x] **F1.2** "INTRADAY order" / "DELIVERY order" label on every BUY card (GrowwActionRow)
-- [x] **F1.3** "Order placed? Yes / No" confirm on return from Groww (GrowwActionRow + PendingOrderConfirmDialog)
-- [x] **F1.4** Per-target exact share counts (computeTargetSplit in GrowwAction.kt)
-- [ ] **F1.5** Today's running P&L bar always visible at top of every main tab (START HERE)
+### F1 — Money loop ✅ ALL DONE
+- [x] F1.1 Groww deep-link, F1.2 order type label, F1.3 order confirm, F1.4 per-target shares
+- [x] **F1.5** TodayPnlBar on all 4 main tabs
 
-### F2 — Protection on real phones
-- [ ] **F2.1** Vibrating repeat alerts (2–3 times) for stop-loss + target hits
-- [ ] **F2.2** 3:15 PM vibrating alarm for any open intraday position ("Open Groww and sell now")
-- [x] **F2.3** Stale-entry protection: "This chance passed — wait for the next one." (TradingScreen + HomeScreen)
-- [ ] **F2.4** Battery/autostart setup guide on first launch (Xiaomi/Vivo/Oppo/Realme/Samsung)
+### F2 — Protection ✅ ALL DONE
+- [x] F2.1/F2.2/F2.4 vibrating alerts, 3:15 PM alarm, BatteryGuard
+- [x] F2.3 Stale-entry protection
 
-### F3 — Right path for user's money
-- [ ] **F3.1** Capital-path rule: ₹500–2k → show SIP only; ₹2k–10k → delivery; ₹10k+ → full app
-- [ ] **F3.2** Daily "How much money today?" check-in — tap ₹1k/₹2k/₹5k/₹10k/Other/Skip
-- [ ] **F3.3** Budget-fit filter: never show a stock the user cannot afford
+### F3 — Right path for user's money ✅ ALL DONE
+- [x] F3.1 capital-path rule, F3.2 daily check-in, F3.3 budget-fit filter
 
-### F4 — Profit completers
-- [ ] **F4.1** "My Stocks" daily HOLD/SELL verdicts for confirmed delivery positions
-- [ ] **F4.2** SIP reminder notification + AMFI growth line ("Your ₹12,000 is now ₹13,100 +9%")
-- [ ] **F4.3** Weekly loss limit (stops all recommendations when crossed)
+### F4 — Profit completers ✅ ALL DONE
+- [x] F4.1 My Stocks daily verdicts (MyStockCard)
+- [x] F4.2 AMFI growth line + "SIP" jargon sweep
+- [x] F4.3 weekly loss limit
 
-### F5 — Practice Mode
-- [ ] **F5.1** Practice Mode — virtual money, always labeled PRACTICE, never mixed with real
-- [ ] **F5.2** "How to open Groww account" 3-step first-launch flow
+### F5 — Practice Mode ✅ ALL DONE
+- [x] F5.1 Practice Mode
+- [x] F5.2 First-launch Groww onboarding
 
-### F6 — Simpler UI
-- [ ] **F6.1** Remove/hide from navigation: Backtesting, Sector, Breadth, News, Portfolio,
-              Dashboard, Recommendations screens
+### F6 — Simpler UI ✅ MOSTLY DONE
+- [x] F6.1 Unused screens removed from navigation
+- [x] F6.3 Weekly report card (WeeklyReportLine in HomeScreen)
 - [ ] **F6.2** Contextual news: stock news INSIDE Stock tab, intraday news INSIDE Intraday tab
-- [ ] **F6.3** Report card: "This week's picks: 7 right, 3 wrong — total +₹450"
 
-### F7 — More Ways to Earn (in Guide tab Advanced section)
-- [ ] **F7.1** Gold/Silver verdict card (Yahoo Finance free data, 200-day average rule)
-- [ ] **F7.2** IPO alerts (NSE free listings, affordability check)
-- [ ] **F7.3** ETF/Index SIP card ("One fund that owns India's 50 biggest companies")
-- [ ] **F7.4** US Stocks screen (night hours, Yahoo Finance, ₹ context)
+### F7 — More Ways to Earn ✅ ALL DONE
+- [x] F7.1 Gold/Silver verdict card (GOLDBEES/SILVERBEES via Yahoo v8)
+- [x] F7.2 IPO alerts (NseRepository + affordability check)
+- [x] F7.3 ETF/Index SIP card (IndexSipCard, UTI Nifty 50)
+- [x] F7.4 US Stocks (watch-only, 4 stocks via Yahoo v8)
 - [ ] **F7.5** Market-closed screen with countdown ("Opens in X hours")
 
 ### F8 — Polish
-- [ ] **F8.1** B0.2d: phone brand detection + battery/autostart deep-link per brand
-- [ ] **F8.2** 10-second test: any first-time user knows what to do within 10 seconds of opening
+- [x] **F8.2** 10-second test — OneDecisionCard restructured: BUY→name→spend→profit→stop→button
+- [ ] **F8.1** Phone brand detection + battery/autostart deep-link per brand
+
+### NEXT PRIORITIES (work in this order)
+1. **F6.2** — Add contextual news inside Stock tab (use Yahoo news API or NSE)
+2. **F7.5** — Market-closed countdown screen (MarketCalendar already has nextMarketOpenMs())
+3. **F8.1** — Battery/autostart deep-link per brand (Xiaomi, Samsung, etc.)
 
 ---
 
@@ -210,5 +218,5 @@ In simple English. With a voice option. While the app silently protects them fro
 **When that is true on a real phone, the project is done.**
 
 ---
-*Last updated by operator: 2026-08-13 (session 2 — jargon sweep complete, F1.1–F1.4 done, next: F1.5 P&L bar)*
+*Last updated by operator: 2026-08-13 (session 3 — F1.5, F4.2, F5.2, F6.1, F6.3, F7.1–7.3, F8.2 done; full jargon+crash+dead-API audit passed)*
 *Source of truth: docs/REQUIREMENTS_FINAL.md — never contradict it*
