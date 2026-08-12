@@ -1,78 +1,69 @@
 package com.example.myapplication3.ui.screen
 
 import android.content.Context
-import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import com.example.myapplication3.tts.HindiTtsManager
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication3.ui.theme.DarkBackground
-import com.example.myapplication3.ui.theme.DarkBorder
 import com.example.myapplication3.ui.theme.DarkCard
 import com.example.myapplication3.ui.theme.GoldAccent
+import com.example.myapplication3.ui.theme.GoldContainer
 import com.example.myapplication3.ui.theme.GoldLight
+import com.example.myapplication3.ui.theme.GreenPrimary
 import com.example.myapplication3.ui.theme.TextMuted
 import com.example.myapplication3.ui.theme.TextOnGold
 import com.example.myapplication3.ui.theme.TextPrimary
 import com.example.myapplication3.ui.theme.TextSecondary
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.Locale
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * First-launch walkthrough (ROADMAP P1 #9) — three skippable cards, shown ONCE.
+ * First-launch walkthrough (F5.2) — shown ONCE on the very first open.
  *
- * One idea per card, in the user's own words (U9.1 simple English, U9.4 big
- * text): the app only advises (U0 trust), "I bought it" starts the watch
- * (U4.1/U4.2), and alerts + battery are how the protection reaches a closed
- * app (U4.3/U4.5). Skip is always one tap away — zero-effort users are never
- * trapped in a tutorial (U2.1).
+ * Flow:
+ *   "Do you have Groww?" →
+ *     "Yes" → real mode, mark done, open app
+ *     "No"  → 3-step setup guide → "Start with Practice Money"
+ *              → practice mode, mark done, open app
  *
- * Persistence is a plain SharedPreferences boolean — readable synchronously in
- * MainActivity.onCreate BEFORE any composition, so a returning user starts
- * straight on the Stock tab and this screen never even builds.
+ * Persistence: plain SharedPreferences boolean (readable synchronously in
+ * MainActivity.onCreate BEFORE any composition).
  */
 object FirstLaunchPrefs {
     private const val FILE = "first_launch"
@@ -88,77 +79,20 @@ object FirstLaunchPrefs {
     }
 }
 
-private data class WalkthroughCard(
-    val emoji: String,
-    val title: String,
-    val body: String
-)
-
-// The exact three ideas from ROADMAP P1 #9 — do not add cards; three is the
-// whole story (advise → track → protect).
-private val walkthroughCards = listOf(
-    WalkthroughCard(
-        emoji = "🤝", // handshake
-        title = "Your money stays in YOUR hands",
-        body  = "This app tells you what to do. YOU place the order in Groww. " +
-                "The app never touches your money."
-    ),
-    WalkthroughCard(
-        emoji = "👀", // eyes
-        title = "After you buy, the app watches for you",
-        body  = "After you buy, tap 'I bought it' — then the app watches your " +
-                "trade and warns you when to sell."
-    ),
-    WalkthroughCard(
-        emoji = "🛡️", // shield
-        title = "Let the app protect you",
-        body  = "Say yes to alerts and battery — that is how the app protects " +
-                "your money even when closed."
-    )
-)
-
-/**
- * Tiny ViewModel whose only job is reaching the @Singleton HindiTtsManager so
- * every card has a speaker (U8.2 "every lesson can be listened to").
- * Same voice-readiness probe as LearningViewModel: HindiTtsManager keeps its
- * ready flag private and speakText() fails silently, so we probe the phone's
- * default TTS engine once and HIDE the Listen button when there is no voice —
- * a dead button would break U2.1.
- */
 @HiltViewModel
 class FirstLaunchViewModel @Inject constructor(
-    @ApplicationContext context: Context,
-    private val ttsManager: HindiTtsManager
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
-    private val _voiceReady = MutableStateFlow(true) // assume OK until the probe says no
-    val voiceReady: StateFlow<Boolean> = _voiceReady.asStateFlow()
+    private val practiceKey = booleanPreferencesKey("practice_mode")
 
-    private var probeTts: TextToSpeech? = null
-
-    init {
-        probeTts = TextToSpeech(context) { status ->
-            val engine = probeTts
-            // Same English-first locale candidates as HindiTtsManager (rule A4)
-            val ok = status == TextToSpeech.SUCCESS && engine != null &&
-                listOf(Locale("en", "IN"), Locale.ENGLISH, Locale.US, Locale.UK).any { locale ->
-                    val res = engine.isLanguageAvailable(locale)
-                    res != TextToSpeech.LANG_MISSING_DATA && res != TextToSpeech.LANG_NOT_SUPPORTED
-                }
-            _voiceReady.value = ok
-            engine?.shutdown()
-            probeTts = null
-        }
-    }
-
-    fun speak(text: String) = ttsManager.speakText(text, "walkthrough")
-
-    override fun onCleared() {
-        super.onCleared()
-        probeTts?.shutdown()
-        probeTts = null
+    /** Called when user says "Yes, I have Groww" — disable practice mode (real money). */
+    fun setRealMode() {
+        viewModelScope.launch { dataStore.edit { it[practiceKey] = false } }
     }
 }
+
+private enum class OnboardingStep { GROWW_QUESTION, SETUP_STEPS }
 
 @Composable
 fun FirstLaunchScreen(
@@ -166,131 +100,218 @@ fun FirstLaunchScreen(
     vm: FirstLaunchViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val voiceReady by vm.voiceReady.collectAsState()
+    var step by rememberSaveable { mutableStateOf(OnboardingStep.GROWW_QUESTION) }
 
-    // rememberSaveable — a rotation mid-walkthrough must not restart it at card 1
-    var page by rememberSaveable { mutableStateOf(0) }
-    val lastPage = walkthroughCards.lastIndex
-    val card = walkthroughCards[page]
+    // System back on the setup-steps page goes back to the question, not out of the app
+    BackHandler(enabled = step == OnboardingStep.SETUP_STEPS) {
+        step = OnboardingStep.GROWW_QUESTION
+    }
 
-    // Both Skip and the final Continue land here: set the once-only flag FIRST,
-    // then hand control back to normal navigation. If the process dies before
-    // this runs, the walkthrough simply shows again — safe either way (B8).
-    fun finish() {
+    fun finishReal() {
+        vm.setRealMode()
         FirstLaunchPrefs.markDone(context)
         onDone()
     }
 
-    // System back walks one card back instead of quitting the app mid-intro;
-    // on the first card it falls through to the default (leave the app).
-    BackHandler(enabled = page > 0) { page-- }
+    fun finishPractice() {
+        // practiceMode defaults to true in DataStore — nothing to set, just mark done
+        FirstLaunchPrefs.markDone(context)
+        onDone()
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBackground)
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // The card area scrolls on tiny screens / huge accessibility fonts,
-        // while the dots + buttons below stay pinned and always reachable.
-        // heightIn(min = viewport) keeps the card vertically centered when it
-        // fits — a bare weight-Spacer would collapse inside verticalScroll.
-        BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
-            val viewportHeight = maxHeight
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .heightIn(min = viewportHeight),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // ── The one idea of this card ────────────────────────────────
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape    = RoundedCornerShape(16.dp),
-                    colors   = CardDefaults.cardColors(containerColor = DarkCard)
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(card.emoji, fontSize = 56.sp)
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            card.title,
-                            style      = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color      = TextPrimary,
-                            textAlign  = TextAlign.Center
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        // Big text (U9.4) — the sentence the user must remember
-                        Text(
-                            card.body,
-                            fontSize   = 20.sp,
-                            lineHeight = 30.sp,
-                            color      = TextSecondary,
-                            textAlign  = TextAlign.Center
-                        )
-                        // Voice-parity: the speaker reads the SAME words the
-                        // card shows (U1.5). Hidden entirely when the phone has
-                        // no English voice — never a dead button (U2.1).
-                        if (voiceReady) {
-                            Spacer(Modifier.height(12.dp))
-                            TextButton(onClick = { vm.speak("${card.title}. ${card.body}") }) {
-                                Text("🔊  Listen", fontSize = 16.sp, color = GoldLight)
-                            }
-                        }
-                    }
-                }
-            }
+        Spacer(Modifier.height(32.dp))
+
+        when (step) {
+            OnboardingStep.GROWW_QUESTION -> GrowwQuestionStep(
+                onHaveGroww   = { finishReal() },
+                onNoGroww     = { step = OnboardingStep.SETUP_STEPS }
+            )
+            OnboardingStep.SETUP_STEPS -> SetupStepsStep(
+                onStartPractice = { finishPractice() }
+            )
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(32.dp))
+    }
+}
 
-        // ── Where am I? — three dots ─────────────────────────────────────────
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            walkthroughCards.indices.forEach { i ->
-                Box(
-                    Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(if (i == page) GoldAccent else DarkBorder)
+// ── Step 1: Do you have a Groww account? ──────────────────────────────────────
+
+@Composable
+private fun GrowwQuestionStep(
+    onHaveGroww: () -> Unit,
+    onNoGroww: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkCard)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text("📈", fontSize = 56.sp, textAlign = TextAlign.Center)
+
+            Text(
+                text = "Welcome to your investing guide",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary,
+                textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = "This app guides you on what to buy and when to sell. " +
+                       "You place the order in Groww — we never touch your money.",
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                color = TextSecondary,
+                textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = "Do you have a Groww account?",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = GoldLight,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+
+    // "Yes" — real mode
+    Button(
+        onClick = onHaveGroww,
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = GreenPrimary,
+            contentColor = TextOnGold
+        )
+    ) {
+        Text("Yes, I have Groww", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+    }
+
+    // "Not yet" — setup flow
+    OutlinedButton(
+        onClick = onNoGroww,
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = GoldAccent)
+    ) {
+        Text("Not yet — show me how", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+// ── Step 2: 3-step Groww setup guide ──────────────────────────────────────────
+
+@Composable
+private fun SetupStepsStep(onStartPractice: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkCard)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            Text(
+                text = "How to open a Groww account",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+
+            SetupStep(
+                number = "1",
+                title = "Download Groww",
+                body  = "Search 'Groww' in the Play Store and install it."
+            )
+            SetupStep(
+                number = "2",
+                title = "Sign up and verify",
+                body  = "Sign up with your phone number. You will need your PAN card. " +
+                        "Groww verifies accounts in 1–2 days."
+            )
+            SetupStep(
+                number = "3",
+                title = "Add money and you are ready",
+                body  = "Once verified, add money from your bank. You can start with as little as ₹100."
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = CardDefaults.cardColors(containerColor = GoldContainer)
+            ) {
+                Text(
+                    text = "While you wait for Groww to verify: use Practice Mode below. " +
+                           "You will trade with virtual money — zero risk, real learning.",
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    color = GoldLight,
+                    modifier = Modifier.padding(14.dp)
                 )
             }
         }
+    }
 
-        Spacer(Modifier.height(24.dp))
+    Button(
+        onClick = onStartPractice,
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = GoldAccent,
+            contentColor = TextOnGold
+        )
+    ) {
+        Text("Start with Practice Money →", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+    }
 
-        Button(
-            onClick  = { if (page == lastPage) finish() else page++ },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape    = RoundedCornerShape(12.dp),
-            colors   = ButtonDefaults.buttonColors(
-                containerColor = GoldAccent,
-                contentColor   = TextOnGold
-            )
+    Text(
+        text = "Your practice trades are completely separate from real money. " +
+               "Switch to real mode any time from settings.",
+        fontSize = 12.sp,
+        color = TextMuted,
+        textAlign = TextAlign.Center,
+        lineHeight = 18.sp
+    )
+}
+
+@Composable
+private fun SetupStep(number: String, title: String, body: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Step number circle
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = GoldAccent)
         ) {
             Text(
-                if (page == lastPage) "Continue" else "Next",
-                fontSize   = 18.sp,
-                fontWeight = FontWeight.Bold
+                text = number,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextOnGold,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
             )
         }
-
-        if (page < lastPage) {
-            TextButton(
-                onClick  = { finish() },
-                modifier = Modifier.fillMaxWidth().height(48.dp)
-            ) {
-                Text("Skip — take me to the app", fontSize = 16.sp, color = TextMuted)
-            }
-        } else {
-            // Same height as the Skip button so Continue does not jump
-            // when the last card removes Skip.
-            Spacer(Modifier.height(48.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+            Text(body, fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp)
         }
     }
 }
