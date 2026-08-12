@@ -491,7 +491,7 @@ private fun MfBeginnerBanner() {
                     color = GoldLight
                 )
                 Text(
-                    text = "Experts invest your money in shares. With a SIP, you add a little every month.",
+                    text = "Experts invest your money in shares. With a monthly investment plan, you add a little every month.",
                     fontSize = 12.sp,
                     color = TextSecondary,
                     lineHeight = 18.sp
@@ -622,12 +622,12 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
                 // 🔊 read the whole 3-step guidance out loud (rule I5)
                 MfSpeakButton(onClick = {
                     onSpeak(
-                        "How to start a SIP, in 3 steps. " +
+                        "How to start investing, in 3 steps. " +
                         "Step 1: pick one fund below. The first one is the simplest. " +
-                        "Step 2: tap Start this SIP in Groww, and set it up there. " +
+                        "Step 2: tap Start investing in Groww, and set it up there. " +
                         "Most funds allow from 500 rupees a month. " +
                         "Step 3: pick a date just after your salary day, like the 1st or the 5th. " +
-                        "And never stop your SIP when the market falls. " +
+                        "And never stop your monthly investment when the market falls. " +
                         "Cheap months buy you more units."
                     )
                 })
@@ -637,7 +637,7 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
                 fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
             )
             Text(
-                text = "2. Tap 'Start this SIP in Groww' and set it up there. Most funds allow from ₹500 a month.",
+                text = "2. Tap 'Start investing in Groww' and set it up there. Most funds allow from ₹500 a month.",
                 fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
             )
             Text(
@@ -645,7 +645,7 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
                 fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
             )
             Text(
-                text = "Never stop your SIP when the market falls. Cheap months buy you MORE units — stopping then is the #1 beginner mistake.",
+                text = "Never stop your monthly investment when the market falls. Cheap months buy you MORE units — stopping then is the #1 beginner mistake.",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = GoldLight,
@@ -753,7 +753,7 @@ private fun MySipCard(
             },
             text = {
                 Text(
-                    text = "Your real SIP in Groww keeps running. Your saved history here will be erased.",
+                    text = "Your real monthly investment in Groww keeps running. Your saved history here will be erased.",
                     fontSize = 13.sp,
                     color = TextSecondary,
                     lineHeight = 18.sp
@@ -781,7 +781,7 @@ private fun MySipCard(
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Your SIP",
+                    text = "Your monthly investment",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = GoldAccent,
@@ -817,7 +817,7 @@ private fun MySipCard(
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            text = "Today is SIP day — did your ₹${formatIndianRupees(sip.monthlyAmount.toDouble())} get taken?",
+                            text = "Today is your monthly investment day — did your ₹${formatIndianRupees(sip.monthlyAmount.toDouble())} get taken?",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = GoldLight,
@@ -845,7 +845,7 @@ private fun MySipCard(
             // ── Growth line — real NAV data only, never invented (rule B6) ──
             when {
                 sip.totalInvested <= 0.0 -> Text(
-                    text = "No payments counted yet. Tap Yes on SIP day and this line will grow.",
+                    text = "No payments counted yet. Tap Yes on your monthly investment day and this line will grow.",
                     fontSize = 11.sp,
                     color = TextMuted,
                     lineHeight = 16.sp
@@ -853,9 +853,9 @@ private fun MySipCard(
                 nav != null -> {
                     val current = sip.totalUnits * nav
                     val pct = (current - sip.totalInvested) / sip.totalInvested * 100.0
+                    val direction = if (current >= sip.totalInvested) "up" else "down"
                     Text(
-                        text = "You put in ₹${formatIndianRupees(sip.totalInvested)}. It is now about ₹${formatIndianRupees(current)} " +
-                                String.format(Locale.US, "(%+.1f%%)", pct),
+                        text = "Your ₹${formatIndianRupees(sip.totalInvested)} monthly investment is now worth ₹${formatIndianRupees(current)} — $direction ${String.format(Locale.US, "%.1f", kotlin.math.abs(pct))}%",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (current >= sip.totalInvested) GreenPrimary else RedPrimary,
@@ -873,7 +873,7 @@ private fun MySipCard(
                     }
                 }
                 else -> Text(
-                    text = "You put in ₹${formatIndianRupees(sip.totalInvested)}. Could not get today's price — tap to retry.",
+                    text = "Your ₹${formatIndianRupees(sip.totalInvested)} monthly investment. Could not get today's price — tap to retry.",
                     fontSize = 11.sp,
                     color = TextSecondary,
                     lineHeight = 16.sp,
@@ -1468,7 +1468,7 @@ private fun MfStartSipSection(
         }
         // mfapi.in has no min-SIP field — say the honest standard line, no invented number
         Text(
-            text = "Most funds allow SIP from ₹500 a month.",
+            text = "Most funds allow monthly investments from ₹500 a month.",
             fontSize = 11.sp,
             color = TextSecondary
         )
@@ -1501,7 +1501,7 @@ private fun MfStartSipSection(
         ) {
             val contentTint = if (isRisky) TextMuted else TextOnGold
             Text(
-                text = "Start this SIP in Groww",
+                text = "Start investing in Groww",
                 color = contentTint,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp
@@ -1524,7 +1524,7 @@ private fun MfStartSipSection(
             )
         }
         Text(
-            text = "You place the SIP yourself in Groww. This app never touches your money.",
+            text = "You place the monthly investment yourself in Groww. This app never touches your money.",
             fontSize = 12.sp,
             color = TextMuted,
             lineHeight = 16.sp
@@ -1533,13 +1533,13 @@ private fun MfStartSipSection(
         // ── Track it here (one SIP only — one decision, rule B10) ──
         when {
             isMySipFund -> Text(
-                text = "You track this SIP at the top of this tab.",
+                text = "You track this monthly investment at the top of this tab.",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = GoldLight
             )
             hasSip -> Text(
-                text = "You already track one SIP. Remove it at the top first to track this one.",
+                text = "You already track one monthly investment. Remove it at the top first to track this one.",
                 fontSize = 11.sp,
                 color = TextMuted,
                 lineHeight = 16.sp
@@ -1572,7 +1572,7 @@ private fun MfStartSipSection(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Track my ₹${formatIndianRupees(monthly.toDouble())} SIP (day $sipDay)",
+                        text = "Track my ₹${formatIndianRupees(monthly.toDouble())} monthly investment (day $sipDay)",
                         color = GoldAccent,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
