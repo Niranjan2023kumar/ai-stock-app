@@ -43,6 +43,17 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      # Strip Windows-only paths from gradle.properties — these point to
+      # C:\Program Files\... and a local Avast truststore that don't exist on
+      # ubuntu-latest and cause Gradle to refuse to start.
+      - name: Override Windows-only gradle properties for CI
+        run: |
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          sed -i '/systemProp.javax.net.ssl.trustStore/d' gradle.properties
+          sed -i '/systemProp.javax.net.ssl.trustStorePassword/d' gradle.properties
+          echo "--- gradle.properties after stripping Windows paths ---"
+          cat gradle.properties
+
       # Build only the debug variant — fast, no signing needed, installs fine
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
