@@ -16,6 +16,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Allow this job to create GitHub Releases and upload files to them
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
