@@ -1001,14 +1001,14 @@ private fun ExploreTabContent(
                     vm.speakText(
                         "That's enough for this week. You've reached this week's safety limit. " +
                         "No more trades until next week. Protecting your money is the smart move. " +
-                        "Your SIP keeps working. Saving is also earning."
+                        "Your monthly investment keeps working. Saving is also earning."
                     )
                 })
                 dailyBreached  -> LossLimitCard(weekly = false, onSpeak = {
                     vm.speakText(
                         "That's enough for today. You've reached today's safety limit. " +
                         "No more trades today. Come back tomorrow. " +
-                        "Your SIP keeps working. Saving is also earning."
+                        "Your monthly investment keeps working. Saving is also earning."
                     )
                 })
                 else -> OneDecisionCard(
@@ -1592,7 +1592,7 @@ private fun LossLimitCard(weekly: Boolean, onSpeak: () -> Unit = {}) {
             )
             // Never a dead end (B9): point to the one thing still quietly working.
             Text(
-                "Your SIP keeps working — saving is also earning.",
+                "Your monthly investment keeps working — saving is also earning.",
                 fontSize = 12.sp, color = GreenPrimary, fontWeight = FontWeight.SemiBold, lineHeight = 17.sp
             )
         }
@@ -1794,7 +1794,7 @@ private fun OneDecisionCard(
                 }
                 // Never empty-handed (B9/B7c): point to what IS working right now.
                 Text(
-                    "Your SIP keeps working — see the Mutual Fund tab.",
+                    "Your monthly investment keeps working — see the Mutual Fund tab.",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 // B7c: ONE contextual line chosen by the IST clock — honest, static
@@ -1809,7 +1809,7 @@ private fun OneDecisionCard(
                     if (istHour >= 20 || istHour < 8)
                         "US markets are open at night — see Guide > Advanced > More ways."
                     else
-                        "Gold and SIP keep working on closed days — see Guide > Advanced.",
+                        "Gold and monthly investments keep working on closed days — see Guide > Advanced.",
                     fontSize = 12.sp, color = TextMuted, lineHeight = 17.sp
                 )
                 return@Card
@@ -1919,7 +1919,7 @@ private fun OneDecisionCard(
                     fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary, lineHeight = 20.sp
                 )
                 Text(
-                    "The safest way to grow ₹${fmtRs(amount.toDouble())} is a monthly SIP. Tap 'Mutual Fund' below.",
+                    "The safest way to grow ₹${fmtRs(amount.toDouble())} is a monthly investment. Tap 'Mutual Fund' below.",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 return@Card
@@ -1932,7 +1932,7 @@ private fun OneDecisionCard(
                     fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary, lineHeight = 20.sp
                 )
                 Text(
-                    "Add a little more money, or grow it with a monthly SIP (tap 'Mutual Fund' below).",
+                    "Add a little more money, or grow it with a monthly investment (tap 'Mutual Fund' below).",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 return@Card
@@ -1945,7 +1945,7 @@ private fun OneDecisionCard(
                 )
                 // Never a dead end (B9): always point to what IS possible right now.
                 Text(
-                    "Grow your money safely with a monthly SIP — tap 'Mutual Fund' below.",
+                    "Grow your money safely with a monthly investment — tap 'Mutual Fund' below.",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 return@Card
@@ -1987,7 +1987,7 @@ private fun OneDecisionCard(
                 )
                 // Never a dead end (B9/U1.4): also point to what IS possible right now.
                 Text(
-                    "Or grow your money safely with a monthly SIP — tap 'Mutual Fund' below.",
+                    "Or grow your money safely with a monthly investment — tap 'Mutual Fund' below.",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 return@Card
@@ -1999,7 +1999,7 @@ private fun OneDecisionCard(
                 )
                 // Never a dead end (B9/U1.4): point to what IS possible right now.
                 Text(
-                    "Grow your money safely with a monthly SIP — tap 'Mutual Fund' below.",
+                    "Grow your money safely with a monthly investment — tap 'Mutual Fund' below.",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 return@Card
@@ -2011,28 +2011,35 @@ private fun OneDecisionCard(
                 )
                 // Never a dead end (B9/U1.4): point to what IS possible right now.
                 Text(
-                    "Grow your money safely with a monthly SIP — tap 'Mutual Fund' below.",
+                    "Grow your money safely with a monthly investment — tap 'Mutual Fund' below.",
                     fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
                 )
                 return@Card
             }
 
-            // Header: stock name + small 🔊 (hear this decision) + Details link
+            // F8.2 — 10-second order: 1. Action  2. Name  3. How much  4. Profit  5. Safety stop  6. Button
+            // 1. Action — large green BUY headline
+            Text(
+                "BUY",
+                fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = GreenPrimary
+            )
+
+            // 2. Stock name — plain, no .NS suffix, no jargon
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    best.stockSymbol,
+                    shortStockName(best.stockName, best.stockSymbol),
                     fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     SpeakButton(onClick = {
                         vm.speakText(
-                            "Today's decision. Buy $qty shares of ${best.stockSymbol} at ${effPrice.toInt()} rupees each. " +
-                            "Sell at ${best.targetPrice.toInt()} for about ${profit.toInt()} rupees profit after charges. " +
-                            "If the price falls below ${best.stopLoss.toInt()}, sell right away; your loss stops at ${loss.toInt()} rupees. This is not advice."
+                            "Today's decision. Buy $qty shares of ${shortStockName(best.stockName, best.stockSymbol)} at ${effPrice.toInt()} rupees each. " +
+                            "Profit after charges: about ${profit.toInt()} rupees. " +
+                            "Sell if the price falls to ${best.stopLoss.toInt()} rupees — safety stop. This is not advice."
                         )
                     })
                     TextButton(onClick = { onOpen(best.stockSymbol) }) {
@@ -2041,9 +2048,48 @@ private fun OneDecisionCard(
                 }
             }
 
-            // ── B3: the WHY in words — setup strength, risk word, 1–2 plain
-            // reasons. All from fields the signal already carries; one compact
-            // block so the card stays ONE decision, not a data sheet.
+            // 3. How much — total spend + share count
+            Text(
+                "Spend about ₹${fmtRs(qty * effPrice)} — buy $qty shares at ₹${fmtRs(effPrice)} each",
+                fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary, lineHeight = 20.sp
+            )
+
+            // 4. Profit after charges (positive — already checked above)
+            Text(
+                "Profit after charges: about +₹${fmtRs(profit)} (sell at ₹${fmtRs(best.targetPrice)})",
+                fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GreenPrimary, lineHeight = 18.sp
+            )
+
+            // 5. Safety stop — plain language, no "stop-loss" jargon
+            Text(
+                "Sell if it falls to ₹${fmtRs(best.stopLoss)} (safety stop — the app alerts you)",
+                fontSize = 13.sp, color = TextSecondary, lineHeight = 18.sp
+            )
+
+            // 6. ONE button: place order in Groww
+            if (practiceMode) {
+                // Practice: record a fake-money trade directly, no real Groww order.
+                Button(
+                    onClick = { vm.trackTrade(best, effPrice, OrderType.DELIVERY, qty) },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = GoldAccent, contentColor = TextOnGold)
+                ) { Text("Practice buy — virtual money", fontWeight = FontWeight.Bold) }
+            } else {
+                // Persist the pending-order marker BEFORE Groww opens (locked decision
+                // #3): if Android kills us while the user places the order, the
+                // "Order placed?" confirm — price AND quantity — still re-appears.
+                GrowwActionRow(
+                    symbol = best.stockSymbol,
+                    orderType = OrderType.DELIVERY,
+                    suggestedPrice = effPrice,
+                    externalConfirm = true,
+                    onLaunch = { vm.startPendingOrder(best, OrderType.DELIVERY, effPrice, qty) }
+                )
+            }
+
+            // ── Supporting context (B3): setup, risk, sell plan, track record ─────
+            // Shown BELOW the main decision so they don't delay the 10-second read.
             val setupWord = when {
                 best.confidence >= 90 -> "Strong setup"
                 best.confidence >= 84 -> "Okay setup"
@@ -2080,63 +2126,14 @@ private fun OneDecisionCard(
                     maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             }
-            // E3a: one-line honest track record for THIS pick, under the Details
-            // link. Null = nothing honest to say = nothing rendered.
             if (trustLine != null) {
                 Text(trustLine, fontSize = 11.sp, color = TextMuted, lineHeight = 15.sp)
             }
-
-            // ONE stock, ONE price — no range, no choice (rule B10)
-            Text(
-                "Buy now at ₹${fmtRs(effPrice)}",
-                fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary, lineHeight = 36.sp
-            )
-            Text(
-                "Buy $qty shares",
-                fontSize = 14.sp, fontWeight = FontWeight.Bold, color = GreenPrimary
-            )
-            Surface(shape = RoundedCornerShape(8.dp), color = DarkSurfaceElevated) {
-                Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    // Trust stop-loss — the app watches so the user doesn't have to
-                    Text(
-                        "🛑 If it drops to ₹${fmtRs(best.stopLoss)}, sell — the app will alert you",
-                        fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
-                    )
-                    Text(
-                        "🎯 Sell at ₹${fmtRs(best.targetPrice)} → about ₹${fmtRs(profit)} profit after charges (estimate)",
-                        fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
-                    )
-                }
-            }
-
-            // ── The money loop (B0.2): place THIS delivery order in Groww ────
-            // (qty >= 1 and profit > 0 are guaranteed — we returned early otherwise)
             val exits = computeTargetSplit(qty, best.targetPrice, best.target2, best.target3)
             if (exits.size > 1) {
                 Text(
-                    // Plain words, not "T1/T2" jargon — same wording as TradingScreen.
                     "Sell plan: " + exits.joinToString(", ") { "${ordinalLabel(it.index)} target - sell ${it.shares}" },
                     fontSize = 11.sp, color = TextSecondary, lineHeight = 15.sp
-                )
-            }
-            if (practiceMode) {
-                // Practice: record a fake-money trade directly, no real Groww order.
-                Button(
-                    onClick = { vm.trackTrade(best, effPrice, OrderType.DELIVERY, qty) },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = GoldAccent, contentColor = TextOnGold)
-                ) { Text("🧪 Practice buy — fake money", fontWeight = FontWeight.Bold) }
-            } else {
-                // Persist the pending-order marker BEFORE Groww opens (locked decision
-                // #3): if Android kills us while the user places the order, the
-                // "Order placed?" confirm — price AND quantity — still re-appears.
-                GrowwActionRow(
-                    symbol = best.stockSymbol,
-                    orderType = OrderType.DELIVERY,
-                    suggestedPrice = effPrice,
-                    externalConfirm = true,
-                    onLaunch = { vm.startPendingOrder(best, OrderType.DELIVERY, effPrice, qty) }
                 )
             }
 
