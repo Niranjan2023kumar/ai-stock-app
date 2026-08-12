@@ -34,14 +34,18 @@ jobs:
 
       # GitHub's ubuntu-latest has Android SDK at $ANDROID_HOME.
       # We write local.properties so Gradle finds it (this file is .gitignored).
+      # API keys come from GitHub Secrets — add them at:
+      # https://github.com/Niranjan2023kumar/ai-stock-app/settings/secrets/actions
+      # If a secret is not set it defaults to empty string (app handles gracefully).
       - name: Create local.properties
         run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          echo "POLYGON_API_KEY=placeholder"    >> local.properties
-          echo "FINNHUB_API_KEY=placeholder"    >> local.properties
-          echo "ALPHAVANTAGE_API_KEY=placeholder" >> local.properties
-          echo "OPENAI_API_KEY=placeholder"      >> local.properties
-          echo "ANTHROPIC_API_KEY=placeholder"   >> local.properties
+          echo "sdk.dir=$ANDROID_HOME"                                    > local.properties
+          echo "POLYGON_API_KEY=${{ secrets.POLYGON_API_KEY }}"          >> local.properties
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}"          >> local.properties
+          echo "ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }}" >> local.properties
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}"            >> local.properties
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}"      >> local.properties
+          echo "NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}"                >> local.properties
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
