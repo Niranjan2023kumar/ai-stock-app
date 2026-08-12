@@ -275,7 +275,7 @@ class StockResearchViewModel @Inject constructor(
                     "$label you can buy this stock now."
             }
             "SELL" -> "$label do not buy now. It may go down."
-            "HOLD" -> "$label if you own it, keep it. Do not buy more."
+            "HOLD" -> "$label if you own it, keep it. Do not buy more now."
             "WAIT" -> "$label wait for now. It is not a good time to buy."
             else   -> ""
         }
@@ -372,9 +372,9 @@ class StockResearchViewModel @Inject constructor(
             if (data.ma200 > 0) append("MA200=$cur${String.format("%.0f", data.ma200)} ")
             if (data.ma50 > 0 && data.ma200 > 0) {
                 append(if (data.currentPrice > data.ma50 && data.currentPrice > data.ma200)
-                    "(price ABOVE both MAs — bullish)" else
+                    "(price ABOVE both MAs — rising trend)" else
                     if (data.currentPrice < data.ma50 && data.currentPrice < data.ma200)
-                        "(price BELOW both MAs — bearish)" else "(mixed MA positioning)")
+                        "(price BELOW both MAs — falling trend)" else "(mixed trend)")
             }
         }
 

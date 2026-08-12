@@ -91,7 +91,7 @@ class SuggestionLedger @Inject constructor(
                 "each suggestion is checked against the real prices of that day. " +
                 "A BUY is PASS if the day's high reached the target, or the stock " +
                 "closed above the suggested price. It is FAIL if the day's low " +
-                "touched the stop-loss, or it closed at or below the suggested " +
+                "touched the safety stop, or it closed at or below the suggested " +
                 "price. A SELL is judged the mirror way. If both the target and " +
                 "the stop were touched the same day, it counts as FAIL — the app " +
                 "never claims a win it cannot prove. If real prices could not be " +

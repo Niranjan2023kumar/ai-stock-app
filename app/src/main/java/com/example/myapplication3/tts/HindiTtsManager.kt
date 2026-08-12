@@ -184,35 +184,24 @@ class HindiTtsManager @Inject constructor(
     fun speakStopLossAlert(symbol: String, price: Double) {
         if (!isVoiceOn(context)) return   // master voice switch: OFF = fully silent
         if (!isReady) return
-        val text = if (useHindiNow(hindiRequested())) {
-            "Dhyan do! $symbol stop-loss par aa gaya — daam ${price.toInt()} rupaye. " +
-                    "Abhi Groww kholkar bech do."
-        } else {
-            "Alert! Stop loss triggered for $symbol at ${price.toInt()} rupees."
-        }
+        // A4: plain English only — TTS must match screen text exactly (no Hindi)
+        val text = "Sell $symbol now — it has reached your safety stop at ${price.toInt()} rupees. Open Groww and sell."
         speak(text, "$symbol-sl")
     }
 
     fun speakTargetAlert(symbol: String, targetNumber: Int, price: Double) {
         if (!isVoiceOn(context)) return   // master voice switch: OFF = fully silent
         if (!isReady) return
-        val text = if (useHindiNow(hindiRequested())) {
-            "Badhai ho! $symbol ka target $targetNumber poora ho gaya — " +
-                    "daam ${price.toInt()} rupaye."
-        } else {
-            "Congratulations! $symbol target $targetNumber reached at ${price.toInt()} rupees."
-        }
+        // A4: plain English only
+        val text = "$symbol reached Target $targetNumber at ${price.toInt()} rupees. Open Groww and sell to take your profit."
         speak(text, "$symbol-t$targetNumber")
     }
 
     fun speakDailyLimitWarning() {
         if (!isVoiceOn(context)) return   // master voice switch: OFF = fully silent
         if (!isReady) return
-        val text = if (useHindiNow(hindiRequested())) {
-            "Savdhan! Aaj ke nuksan ki seema poori ho gayi. Aaj koi nayi trade mat karo."
-        } else {
-            "Warning! Daily loss limit reached. No new trades today."
-        }
+        // A4: plain English only
+        val text = "You have lost enough today. The app has stopped new suggestions to protect your money."
         speak(text, "daily-limit")
     }
 

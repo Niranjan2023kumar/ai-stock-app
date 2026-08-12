@@ -70,7 +70,7 @@ private fun fmtMoney(cur: String, v: Double, decimals: Int = 0): String =
 private fun verdictSentence(recommendation: String): Pair<String, Color>? = when (recommendation) {
     "BUY"  -> "You can buy this stock now" to GreenPrimary
     "SELL" -> "Do not buy now — it may go down" to RedPrimary
-    "HOLD" -> "If you own it, keep it — do not buy more" to GoldAccent
+    "HOLD" -> "Watching — if you own it, keep it. Do not buy more." to GoldAccent
     "WAIT" -> "Wait for now — it is not a good time to buy" to GoldAccent
     else   -> null
 }
@@ -547,7 +547,7 @@ private fun AiPredictionSection(
                     val (recColor, recBg) = when (prediction.recommendation) {
                         "BUY"  -> Pair(GreenPrimary, GreenPrimary.copy(alpha = 0.15f))
                         "SELL" -> Pair(RedPrimary,   RedPrimary.copy(alpha = 0.15f))
-                        "HOLD" -> Pair(GoldAccent,   GoldAccent.copy(alpha = 0.15f))
+                        "HOLD" -> Pair(GoldAccent,   GoldAccent.copy(alpha = 0.15f))  // displayed as "Watching"
                         else   -> Pair(MaterialTheme.colorScheme.onSurface, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     }
 
@@ -560,7 +560,7 @@ private fun AiPredictionSection(
                             val recLabel = when (prediction.recommendation) {
                                 "BUY"  -> "BUY"
                                 "SELL" -> "SELL"
-                                "HOLD" -> "HOLD"
+                                "HOLD" -> "Watching"
                                 "WAIT" -> "WAIT"
                                 else   -> prediction.recommendation
                             }

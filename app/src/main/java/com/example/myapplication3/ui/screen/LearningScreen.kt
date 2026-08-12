@@ -309,11 +309,11 @@ private data class GuideLesson(
 private val guideLessons = listOf(
     GuideLesson(
         id    = "stop_loss",
-        title = "What a stop-loss saves you",
-        body  = "A stop-loss is your exit price if a trade goes wrong. You decide it BEFORE you buy. " +
+        title = "What a safety stop saves you",
+        body  = "A safety stop is your exit price if a trade goes wrong. You decide it BEFORE you buy. " +
                 "If the price falls to that level, you sell right away — no waiting, no hoping. " +
                 "A small loss today keeps your money alive for the next good trade. " +
-                "Every signal in this app comes with a stop-loss. Never trade without one.",
+                "Every signal in this app comes with a safety stop. Never trade without one.",
         moneyLine = "How this makes you money: small losses never become big losses, so your money survives to catch the winning days."
     ),
     GuideLesson(
@@ -328,8 +328,8 @@ private val guideLessons = listOf(
     ),
     GuideLesson(
         id    = "sip",
-        title = "How SIP grows money",
-        body  = "SIP means putting a small fixed amount into a mutual fund every month. " +
+        title = "How monthly investing grows money",
+        body  = "A monthly investment means putting a small fixed amount into a mutual fund every month. " +
                 "When the market falls, the same money buys MORE units — so a fall helps you later. " +
                 "Over the years your returns start earning their own returns. This is called compounding. " +
                 "Example: ₹2,000 every month at about 12% a year can grow to about ₹4.6 lakh in 10 years — you put in only ₹2.4 lakh. " +
@@ -343,13 +343,13 @@ private val guideLessons = listOf(
                 "When the price reaches the target, sell and be happy with the profit. " +
                 "Do not wait for 'a little more' — that is how a profit turns back into a loss. " +
                 "The app sets targets so the possible profit is bigger than the possible loss.",
-        moneyLine = "How this makes you money: booked profit is real money in your account — unbooked profit can vanish in one bad hour."
+        moneyLine = "How this makes you money: profit you take out is real money in your account — uncollected profit can vanish in one bad hour."
     ),
     GuideLesson(
         id    = "mistakes",
         title = "Common mistakes that lose money",
         body  = "Five ways beginners lose money: " +
-                "1) Buying without a stop-loss. " +
+                "1) Buying without a safety stop. " +
                 "2) Adding more money to a falling stock. " +
                 "3) Trading with money needed at home. " +
                 "4) Revenge trading — one loss, then a bigger angry trade. " +
@@ -655,10 +655,10 @@ private data class GlossaryTerm(val term: String, val meaning: String)
 // C24/I2 — definitions of jargon terms are ONE line of simple English: the
 // glossary may explain a word other people use, but never in more jargon.
 private val glossaryTerms = listOf(
-    GlossaryTerm("RSI", "A meter from 0 to 100 that shows if a stock has run up too fast (tired) or fallen too much (maybe cheap)."),
-    GlossaryTerm("MACD", "A chart line that hints when a price trend may be changing direction."),
+    GlossaryTerm("RSI (tiredness meter)", "A number from 0 to 100 that shows if a stock has run up too fast (tired — may fall) or fallen too much (maybe cheap — may rise). This app says 'the stock looks tired' instead of showing you the number."),
+    GlossaryTerm("MACD (trend signal)", "A chart line that hints when a price trend may be changing direction. This app describes it in plain words so you never need to know this term."),
     GlossaryTerm("VWAP", "The day's average trading price — day traders compare the live price with it."),
-    GlossaryTerm("Stop Loss", "The price at which you exit your position to stop further loss. Most important tool to protect your capital."),
+    GlossaryTerm("Safety stop", "The price at which you sell to stop a loss from getting bigger. The most important protection tool. This app sets it automatically on every pick."),
     GlossaryTerm("Target", "The price at which you plan to book your profit. Always decide this before entering a trade."),
     GlossaryTerm("Volume", "Total number of shares bought and sold in a day. Higher volume means more interest in the stock."),
     GlossaryTerm("NSE", "National Stock Exchange — India's largest stock exchange where Nifty 50 is traded."),
@@ -678,10 +678,10 @@ private val glossaryTerms = listOf(
     GlossaryTerm("Bear Market", "Falling market — when the market drops 20% or more. A bear swipes downward with its paw."),
     GlossaryTerm("Intraday", "Buying and selling shares within the same day. No position is held overnight."),
     GlossaryTerm("Swing Trade", "Holding shares for a few days to weeks. A style between intraday and long-term investing."),
-    GlossaryTerm("Candlestick", "Visual representation of price movement on a chart. Green candle = price went up, red candle = price went down."),
+    GlossaryTerm("Price chart bar", "Each bar on a price chart shows one day's price movement. Green = price went up, red = price went down."),
     GlossaryTerm("Support", "A price level where the stock repeatedly stops falling. Can be a good place to buy — but it can break, so always set a Stop Loss."),
     GlossaryTerm("Resistance", "A price level where the stock repeatedly stops rising. Good place to consider booking profit."),
-    GlossaryTerm("Breakout", "When a stock breaks above its Resistance level. Can signal a strong move up — but half of breakouts fail, so always set a Stop Loss."),
+    GlossaryTerm("Price jump (breakout)", "When a stock suddenly trades above a level it was stuck below. Can mean a strong move up — but half of these fail, so always have a safety stop."),
     GlossaryTerm("Open Interest", "How many risky F&O bets are open right now — this app never touches F&O."),
     GlossaryTerm("EBITDA", "A company's core profit before interest, tax and paper charges — higher is better."),
     GlossaryTerm("Face Value", "The original price of a share set by the company. Usually ₹1, ₹2, or ₹10. Dividend is calculated on this."),
