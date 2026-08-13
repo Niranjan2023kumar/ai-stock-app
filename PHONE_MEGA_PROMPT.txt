@@ -1,5 +1,5 @@
 ================================================================================
-  AI STOCK APP — ULTIMATE OPERATOR PROMPT (v3.0, 2026-08-13)
+  AI STOCK APP — ULTIMATE OPERATOR PROMPT (v4.0, 2026-08-13 — ALL FEATURES DONE)
   Copy EVERYTHING below and paste into Claude.ai on your phone.
   You get full control. Zero PC needed. Nothing to ask.
 ================================================================================
@@ -112,35 +112,36 @@ app/src/main/java/com/example/myapplication3/
   Guide       = LearningScreen.kt
 
 ════════════════════════════════════════════════════════
-SECTION 5: CURRENT STATE (as of 2026-08-13)
+SECTION 5: CURRENT STATE (as of 2026-08-13, session 4 — ALL DONE)
 ════════════════════════════════════════════════════════
 
-DONE — do NOT redo these (all audited + clean as of 2026-08-13 session 3):
+ALL FEATURES COMPLETE — project matches DEFINITION OF DONE.
+Do NOT re-implement anything below. Run audit scans first before any session.
+
   ✅ Fix waves v1.1–v1.9: full jargon sweep, crash safety, dead API removal
   ✅ GitHub Actions CI: auto-build APK on every push → releases/latest
   ✅ "stop-loss" → "safety stop" in ALL user-facing strings
-  ✅ "SIP" → "monthly investment" in ALL user-facing strings (HomeScreen, MutualFundsScreen, etc.)
-  ✅ bearish/bullish → falling/rising in StockResearchViewModel
-  ✅ HindiTtsManager: all TTS is plain English (no Hindi speech)
-  ✅ HOLD badge → "Watching"; PASSED → "Too late"
-  ✅ F1.1–F1.5: Groww deep-link, order type, confirm, share counts, TodayPnlBar on all 4 tabs
+  ✅ "SIP" → "monthly investment" in ALL user-facing strings
+  ✅ bearish/bullish → falling/rising; HOLD→Watching; PASSED→Too late
+  ✅ HindiTtsManager: all TTS plain English
+  ✅ F1.1–F1.5: Groww deep-link, order type, confirm, share counts, TodayPnlBar all tabs
   ✅ F2.1–F2.4: vibrating alerts, 3:15 PM alarm, stale-entry protection, BatteryGuard
   ✅ F3.1–F3.3: capital-path rule, daily check-in, budget-fit filter
-  ✅ F4.1–F4.3: My Stocks verdicts, AMFI growth line + SIP jargon sweep, weekly loss limit
-  ✅ F5.1–F5.2: Practice Mode, first-launch Groww onboarding ("Do you have Groww?")
-  ✅ F6.1: Unused screens already removed from navigation
-  ✅ F6.3: Weekly report card (WeeklyReportLine in HomeScreen); thisWeekStats() in SuggestionLedger
-  ✅ F7.1–F7.3: Gold/Silver verdict (GOLDBEES/SILVERBEES), IPO alerts, ETF/Index SIP card
-  ✅ F7.4: US Stocks watch-only (Apple, Microsoft, Google, Amazon via Yahoo v8)
+  ✅ F4.1–F4.3: My Stocks verdicts, AMFI growth line, weekly loss limit
+  ✅ F5.1–F5.2: Practice Mode, first-launch Groww onboarding
+  ✅ F6.1: Unused screens removed from navigation
+  ✅ F6.2: Contextual news — StockNewsSection in TradingScreen + HomeScreen (async, max 3 headlines)
+  ✅ F6.3: Weekly report card (WeeklyReportLine in HomeScreen)
+  ✅ F7.1–F7.4: Gold/Silver, IPO alerts, ETF SIP, US Stocks
+  ✅ F7.5: Market-closed countdown in HomeScreen OneDecisionCard (opensInLabel)
+  ✅ F8.1: BatteryOptimizationCard in SettingsScreen (MIUI/Samsung/Oppo/Vivo/Realme/OnePlus)
   ✅ F8.2: OneDecisionCard 10-second order: BUY→name→spend→profit→safety stop→button
-  ✅ Audit scans all pass: zero jargon hits, zero unsafe .first() calls, zero dead v7 API
-  ✅ Remote trigger "AI Stock App Maintainer" running every 2h (trig_01GpMWRRuisoVFCT2Ubpuz8u)
+  ✅ Audit scans all pass: zero jargon, zero unsafe .first(), zero dead v7 API
+  ✅ Remote trigger "AI Stock App Maintainer" every 2h (trig_01GpMWRRuisoVFCT2Ubpuz8u)
 
-REMAINING WORK (work in this order):
-  → F6.2: Contextual news — stock news inside Stock tab, intraday news inside Intraday tab
-  → F7.5: Market-closed countdown screen ("Opens in X hours" — MarketCalendar.nextMarketOpenMs() exists)
-  → F8.1: Battery/autostart deep-link per phone brand (Xiaomi/Samsung/Vivo/Oppo/Realme)
-  → Full regression test after each change (build must pass via GitHub Actions)
+REMAINING WORK:
+  → None. Run the 3 audit scans (jargon / crash safety / dead API) and fix any regressions.
+  → If a feature breaks: read the file first, understand before fixing, commit + push.
 
 ════════════════════════════════════════════════════════
 SECTION 6: WHAT TO DO (full implementation plan)

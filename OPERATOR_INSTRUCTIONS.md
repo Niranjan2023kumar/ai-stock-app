@@ -134,6 +134,9 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 - [x] F7.2: IPO alerts in MoreWaysScreen (NseRepository.fetchIpos, affordability check)
 - [x] F7.3: ETF/Index SIP card in MoreWaysScreen (IndexSipCard, UTI Nifty 50)
 - [x] F8.2: OneDecisionCard 10-second order — BUY→stock name→spend→profit→safety stop→button; "SIP" swept from HomeScreen
+- [x] F6.2: Contextual news — StockNewsSection in TradingScreen + HomeScreen (fetchYahooNews, max 3, async, hides when empty)
+- [x] F7.5: Market-closed countdown — already in HomeScreen OneDecisionCard (nextMarketOpenMs)
+- [x] F8.1: Phone brand battery deep-link — BatteryOptimizationCard in SettingsScreen (MIUI/Samsung/Oppo/Vivo/Realme/OnePlus)
 
 ---
 
@@ -160,26 +163,24 @@ Most features are done. Remaining work listed below.
 - [x] F5.1 Practice Mode
 - [x] F5.2 First-launch Groww onboarding
 
-### F6 — Simpler UI ✅ MOSTLY DONE
+### F6 — Simpler UI ✅ ALL DONE
 - [x] F6.1 Unused screens removed from navigation
 - [x] F6.3 Weekly report card (WeeklyReportLine in HomeScreen)
-- [ ] **F6.2** Contextual news: stock news INSIDE Stock tab, intraday news INSIDE Intraday tab
+- [x] **F6.2** Contextual news: StockNewsSection composable in TradingScreen (after top pick) + HomeScreen (after OneDecisionCard BUY). Uses InterdayViewModel.fetchNewsFor() → repository.fetchYahooNews(). Max 3 items, async, hides when empty.
 
 ### F7 — More Ways to Earn ✅ ALL DONE
 - [x] F7.1 Gold/Silver verdict card (GOLDBEES/SILVERBEES via Yahoo v8)
 - [x] F7.2 IPO alerts (NseRepository + affordability check)
 - [x] F7.3 ETF/Index SIP card (IndexSipCard, UTI Nifty 50)
 - [x] F7.4 US Stocks (watch-only, 4 stocks via Yahoo v8)
-- [ ] **F7.5** Market-closed screen with countdown ("Opens in X hours")
+- [x] **F7.5** Market-closed countdown already in HomeScreen OneDecisionCard: "The market opens again in about X hours/days" using MarketCalendar.nextMarketOpenMs()
 
-### F8 — Polish
+### F8 — Polish ✅ ALL DONE
 - [x] **F8.2** 10-second test — OneDecisionCard restructured: BUY→name→spend→profit→stop→button
-- [ ] **F8.1** Phone brand detection + battery/autostart deep-link per brand
+- [x] **F8.1** Phone brand battery/autostart deep-link — BatteryOptimizationCard in SettingsScreen. Detects Xiaomi/Samsung/Oppo/Vivo/Realme/OnePlus, launches brand-specific intent, fallback to app details.
 
-### NEXT PRIORITIES (work in this order)
-1. **F6.2** — Add contextual news inside Stock tab (use Yahoo news API or NSE)
-2. **F7.5** — Market-closed countdown screen (MarketCalendar already has nextMarketOpenMs())
-3. **F8.1** — Battery/autostart deep-link per brand (Xiaomi, Samsung, etc.)
+### NEXT PRIORITIES
+All F1–F8 features are complete. Project is done per DEFINITION OF DONE.
 
 ---
 
@@ -218,5 +219,5 @@ In simple English. With a voice option. While the app silently protects them fro
 **When that is true on a real phone, the project is done.**
 
 ---
-*Last updated by operator: 2026-08-13 (session 3 — F1.5, F4.2, F5.2, F6.1, F6.3, F7.1–7.3, F8.2 done; full jargon+crash+dead-API audit passed)*
+*Last updated by operator: 2026-08-13 (session 4 — F6.2, F7.5 verified, F8.1 done; ALL F1–F8 complete; full jargon+crash+dead-API audit passed)*
 *Source of truth: docs/REQUIREMENTS_FINAL.md — never contradict it*
