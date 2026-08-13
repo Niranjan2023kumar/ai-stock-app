@@ -1,8 +1,11 @@
 package com.example.myapplication3.ui.screen
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,8 +46,13 @@ import com.example.myapplication3.ui.component.formatIndianRupees
 import com.example.myapplication3.ui.theme.DarkBorder
 import com.example.myapplication3.ui.theme.DarkCard
 import com.example.myapplication3.ui.theme.GoldAccent
+import com.example.myapplication3.ui.theme.GoldContainer
+import com.example.myapplication3.ui.theme.GoldLight
 import com.example.myapplication3.ui.theme.GreenPrimary
 import com.example.myapplication3.ui.theme.RedPrimary
+import com.example.myapplication3.ui.theme.TextMuted
+import com.example.myapplication3.ui.theme.TextPrimary
+import com.example.myapplication3.ui.theme.TextSecondary
 import com.example.myapplication3.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -260,6 +268,9 @@ fun SettingsScreen(navController: NavController, vm: SettingsViewModel = hiltVie
                 })
             }
 
+            // F8.1 — Phone brand battery/autostart deep-link (only on MIUI/Samsung/Oppo etc)
+            item { BatteryOptimizationCard() }
+
             item { HorizontalDivider(color = MaterialTheme.colorScheme.outline) }
 
             // ── 3. ABOUT — how the app gets its data (honest, B8/C21a) ──────────
@@ -396,6 +407,130 @@ private fun PresetCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(moneyLine, style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  F8.1 — Phone brand battery / autostart deep-link
+// ══════════════════════════════════════════════════════════════════
+
+/**
+ * Shows a "Fix alerts" card ONLY on brands that are known to kill background apps
+ * (Xiaomi/MIUI, Samsung, Oppo, Vivo, Realme, OnePlus).
+ * Dismissed for the session once the user taps either button — no storage needed.
+ * Hides itself on all other brands.
+ */
+@Composable
+private fun BatteryOptimizationCard() {
+    val context = LocalContext.current
+    val brand = Build.MANUFACTURER.lowercase(java.util.Locale.ROOT)
+    val needsCard = brand.contains("xiaomi") || brand.contains("redmi") ||
+        brand.contains("poco") || brand.contains("samsung") ||
+        brand.contains("oppo") || brand.contains("vivo") ||
+        brand.contains("realme") || brand.contains("oneplus")
+    if (!needsCard) return
+
+    var dismissed by rememberSaveable { mutableStateOf(false) }
+    if (dismissed) return
+
+    fun tryStartActivity(intent: Intent): Boolean = runCatching {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+        true
+    }.getOrElse { false }
+
+    fun openBrandSettings() {
+        val launched = when {
+            brand.contains("xiaomi") || brand.contains("redmi") || brand.contains("poco") ->
+                tryStartActivity(
+                    Intent("miui.intent.action.APP_PERM_EDITOR").apply {
+                        setClassName(
+                            "com.miui.securitycenter",
+                            "com.miui.permcenter.autostart.AutoStartManagementActivity"
+                        )
+                    }
+                )
+            brand.contains("oppo") || brand.contains("realme") ->
+                tryStartActivity(
+                    Intent().setComponent(
+                        ComponentName(
+                            "com.coloros.safecenter",
+                            "com.coloros.safecenter.permission.startup.StartupAppListActivity"
+                        )
+                    )
+                ) || tryStartActivity(
+                    Intent().setComponent(
+                        ComponentName(
+                            "com.oppo.safe",
+                            "com.oppo.safe.permission.startup.StartupAppListActivity"
+                        )
+                    )
+                )
+            brand.contains("vivo") ->
+                tryStartActivity(
+                    Intent().setComponent(
+                        ComponentName(
+                            "com.vivo.permissionmanager",
+                            "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"
+                        )
+                    )
+                )
+            brand.contains("oneplus") ->
+                tryStartActivity(
+                    Intent().setComponent(
+                        ComponentName(
+                            "com.oneplus.security",
+                            "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity"
+                        )
+                    )
+                )
+            else -> false // Samsung — fall through to app details below
+        }
+        if (!launched) {
+            // Fallback for Samsung and any brand where the specific screen wasn't found
+            runCatching {
+                context.startActivity(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        }
+        dismissed = true
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape    = RoundedCornerShape(12.dp),
+        colors   = CardDefaults.cardColors(containerColor = GoldContainer)
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                "Make sure alerts always reach you",
+                style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold,
+                color = GoldLight
+            )
+            Text(
+                "Some phones stop apps from sending alerts overnight. " +
+                "Tap below to allow this app to always send you price alerts.",
+                style = MaterialTheme.typography.bodySmall, color = TextSecondary
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick  = { openBrandSettings() },
+                    shape    = RoundedCornerShape(8.dp),
+                    colors   = ButtonDefaults.buttonColors(containerColor = GoldAccent)
+                ) {
+                    Text("Fix alerts", color = TextPrimary, fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodySmall)
+                }
+                TextButton(onClick = { dismissed = true }) {
+                    Text("Already done", color = TextMuted,
+                        style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
     }

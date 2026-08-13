@@ -1497,4 +1497,14 @@ class InterdayViewModel @Inject constructor(
 
     // (The in-memory trade journal is gone — TrackedTrade rows, shown on both the
     // Stock and Intraday tabs with Mark-sold, are the one real journal now.)
+
+    // ── F6.2: contextual news ─────────────────────────────────────────────────
+    /**
+     * Fetches news for [symbol] using the repository's cached Yahoo+Google source.
+     * Runs on IO; returns [] on any error — callers never crash.
+     */
+    suspend fun fetchNewsFor(symbol: String): List<com.example.myapplication3.intraday.ResearchNewsItem> =
+        withContext(Dispatchers.IO) {
+            runCatching { repository.fetchYahooNews(symbol) }.getOrElse { emptyList() }
+        }
 }

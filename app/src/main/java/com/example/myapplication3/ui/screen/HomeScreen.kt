@@ -43,6 +43,7 @@ import com.example.myapplication3.groww.OrderType
 import com.example.myapplication3.ui.component.GrowwActionRow
 import com.example.myapplication3.ui.component.MyStockCard
 import com.example.myapplication3.ui.component.NotificationsOffBanner
+import com.example.myapplication3.ui.component.StockNewsSection
 import com.example.myapplication3.ui.component.TodayPnlBar
 import com.example.myapplication3.ui.component.computeTargetSplit
 import com.example.myapplication3.ui.component.formatIndianRupees
@@ -2138,6 +2139,9 @@ private fun OneDecisionCard(
             }
 
             Text("⚠️ No guarantee — invest only what you can afford to lose.", fontSize = 12.sp, color = TextMuted)
+
+            // F6.2: latest headlines for the recommended stock — async, hides when empty
+            StockNewsSection(symbol = best.stockSymbol, vm = vm)
         }
     }
 }

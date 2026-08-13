@@ -13,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
@@ -21,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication3.core.common.Constants
 import com.example.myapplication3.core.domain.model.TradeDirection
+import com.example.myapplication3.intraday.ResearchNewsItem
 import com.example.myapplication3.tracking.TrackedTrade
 import com.example.myapplication3.ui.viewmodel.InterdayViewModel
 import com.example.myapplication3.ui.theme.CautionAmber
@@ -34,6 +37,7 @@ import com.example.myapplication3.ui.theme.GreenLight
 import com.example.myapplication3.ui.theme.GreenPrimary
 import com.example.myapplication3.ui.theme.RedLight
 import com.example.myapplication3.ui.theme.RedPrimary
+import com.example.myapplication3.ui.theme.TextMuted
 import com.example.myapplication3.ui.theme.TextOnGold
 import com.example.myapplication3.ui.theme.TextPrimary
 import com.example.myapplication3.ui.theme.TextSecondary
@@ -551,4 +555,59 @@ fun GoldChip(
             borderColor          = DarkBorder
         )
     )
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// F6.2 — Contextual news: latest headlines for the shown stock
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Shows up to 3 recent news headlines for [symbol].
+ * Fetches asynchronously on first composition; hides itself when empty or loading.
+ * Used in both TradingScreen (Intraday tab) and HomeScreen (Stock decision card).
+ */
+@Composable
+fun StockNewsSection(symbol: String, vm: InterdayViewModel, modifier: Modifier = Modifier) {
+    val newsItems by produceState<List<ResearchNewsItem>>(initialValue = emptyList(), key1 = symbol) {
+        value = runCatching { vm.fetchNewsFor(symbol) }.getOrElse { emptyList() }
+    }
+    if (newsItems.isEmpty()) return
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text("Latest news", fontSize = 11.sp, color = TextMuted, fontWeight = FontWeight.SemiBold)
+        newsItems.take(3).forEach { item -> StockNewsRow(item) }
+    }
+}
+
+@Composable
+private fun StockNewsRow(item: ResearchNewsItem) {
+    val uriHandler = LocalUriHandler.current
+    val ageMs = System.currentTimeMillis() - item.publishedAt
+    val timeLabel = when {
+        item.publishedAt <= 0L            -> ""
+        ageMs < 60 * 60_000L              -> "${(ageMs / 60_000L).coerceAtLeast(1)}m ago"
+        ageMs < 24 * 60 * 60_000L        -> "${ageMs / 3_600_000L}h ago"
+        ageMs < 48 * 60 * 60_000L        -> "Yesterday"
+        else -> java.text.SimpleDateFormat("dd MMM", java.util.Locale.ENGLISH)
+                    .format(java.util.Date(item.publishedAt))
+    }
+    Surface(
+        modifier = Modifier.fillMaxWidth().then(
+            if (item.url.isNotEmpty())
+                Modifier.clickable { runCatching { uriHandler.openUri(item.url) } }
+            else Modifier
+        ),
+        shape = RoundedCornerShape(8.dp),
+        color = DarkCard
+    ) {
+        Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(item.headline, fontSize = 12.sp, color = TextPrimary,
+                maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(item.source, fontSize = 10.sp, color = TextMuted)
+                if (timeLabel.isNotEmpty()) {
+                    Text("·  $timeLabel", fontSize = 10.sp, color = TextMuted)
+                }
+            }
+        }
+    }
 }

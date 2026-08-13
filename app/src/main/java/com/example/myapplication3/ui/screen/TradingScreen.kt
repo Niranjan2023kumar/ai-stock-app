@@ -41,6 +41,7 @@ import com.example.myapplication3.ui.component.GrowwActionRow
 import com.example.myapplication3.ui.component.MyStockCard
 import com.example.myapplication3.ui.component.NotificationsOffBanner
 import com.example.myapplication3.ui.component.PendingOrderConfirmDialog
+import com.example.myapplication3.ui.component.StockNewsSection
 import com.example.myapplication3.ui.component.TodayPnlBar
 import com.example.myapplication3.ui.component.computeTargetSplit
 import com.example.myapplication3.ui.component.formatIndianRupees
@@ -631,6 +632,13 @@ private fun AiTradeContent(
                     onSpeak = { vm.speakPick(topSignal) },
                     onLaunchGroww = onLaunchGroww,
                     onPracticeBuy = onPracticeBuy
+                )
+            }
+            // F6.2: latest headlines for the top pick — load async, hide when empty
+            item {
+                StockNewsSection(
+                    symbol = topSignal.stockSymbol,
+                    vm = vm
                 )
             }
         }
