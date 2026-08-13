@@ -399,7 +399,7 @@ private fun HelpDialog(onDismiss: () -> Unit, onSpeak: () -> Unit = {}) {
                 Text("• Guide — learn about the stock market", color = TextSecondary, fontSize = 13.sp, lineHeight = 19.sp)
                 HorizontalDivider(color = DarkBorder, thickness = 0.5.dp)
                 Text(
-                    "🔍 Open 'Cheapest / Costliest in the last year' to see stocks near their yearly low or high",
+                    "🔍 Open 'Cheapest / Costliest this year' to find stocks that are unusually cheap or expensive right now",
                     color = TextSecondary, fontSize = 13.sp, lineHeight = 19.sp
                 )
                 Text(
@@ -407,7 +407,7 @@ private fun HelpDialog(onDismiss: () -> Unit, onSpeak: () -> Unit = {}) {
                     color = TextSecondary, fontSize = 13.sp, lineHeight = 19.sp
                 )
                 Text(
-                    "🤖 The app does the analysis for you — you just look",
+                    "🤖 The app checks prices and tells you exactly what to do — one sentence, tap a button, done",
                     color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 19.sp
                 )
                 Text(
@@ -1109,8 +1109,8 @@ private fun ExploreTabContent(
         ) {
             item {
                 Text(
-                    if (budgetPicks.size == 1) "Only 1 good stock fits your money today"
-                    else "Only ${budgetPicks.size} good stocks fit your money today",
+                    if (budgetPicks.size == 1) "We found 1 stock you can afford today"
+                    else "We found ${budgetPicks.size} stocks you can afford today",
                     fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
                 )
@@ -1321,7 +1321,7 @@ private fun DailyCheckInDialog(onPick: (Int) -> Unit, onSkip: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "Pick your budget for today. We'll only show what fits your money. You can change it any time from the ₹ chip on top.",
+                    "How much can you spend today? We'll only show stocks you can afford. You can change this any time.",
                     fontSize = 12.sp, color = TextSecondary
                 )
                 listOf(1_000, 5_000, 10_000, 25_000, 50_000).forEach { amt ->
@@ -2038,9 +2038,9 @@ private fun OneDecisionCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     SpeakButton(onClick = {
                         vm.speakText(
-                            "Today's decision. Buy $qty shares of ${shortStockName(best.stockName, best.stockSymbol)} at ${effPrice.toInt()} rupees each. " +
-                            "Profit after charges: about ${profit.toInt()} rupees. " +
-                            "Sell if the price falls to ${best.stopLoss.toInt()} rupees — safety stop. This is not advice."
+                            "Today's pick. Buy $qty shares of ${shortStockName(best.stockName, best.stockSymbol)} at ${effPrice.toInt()} rupees each. " +
+                            "Expected profit: about ${profit.toInt()} rupees. " +
+                            "Sell if the price falls to ${best.stopLoss.toInt()} rupees. This is not advice."
                         )
                     })
                     TextButton(onClick = { onOpen(best.stockSymbol) }) {
@@ -2051,7 +2051,7 @@ private fun OneDecisionCard(
 
             // 3. How much — total spend + share count
             Text(
-                "Spend about ₹${fmtRs(qty * effPrice)} — buy $qty shares at ₹${fmtRs(effPrice)} each",
+                "Buy $qty shares at ₹${fmtRs(effPrice)} each — total ₹${fmtRs(qty * effPrice)}",
                 fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary, lineHeight = 20.sp
             )
 

@@ -306,7 +306,7 @@ private fun AiTradeContent(
                 CircularProgressIndicator(color = GoldAccent, strokeWidth = 3.dp)
                 Text("Checking ${state.analyzedCount.coerceAtLeast(200)}+ stocks for you…",
                     style = MaterialTheme.typography.bodyMedium, color = TextSecondary, textAlign = TextAlign.Center)
-                Text("We show only the best chances",
+                Text("We only show the best ones",
                     fontSize = 12.sp, color = TextMuted, textAlign = TextAlign.Center)
             }
         }
@@ -380,12 +380,12 @@ private fun AiTradeContent(
             // Rule 3/4/5/6 on THIS stock's own numbers (moved >5%, gap >3%, thin
             // volume, wide stop) — the searched card now gets its own verdict.
             rr.isBlocked ->
-                "${rr.primaryMessage} — buying is off"
+                rr.primaryMessage
             // Capital-path (B0.3a): no budget saved = the MOST cautious case.
             dailyCapital <= 0 ->
                 "First tell me your money — tap the ₹ button on the Stock tab"
             dailyCapital in 1..1_999 ->
-                "Your money is small for intraday — grow it with a SIP (Mutual Fund tab)"
+                "Your money is small for intraday — grow it with a monthly investment (Mutual Fund tab)"
             dailyCapital in 2_000..9_999 ->
                 "Intraday needs ₹10,000+ — see the Stock tab picks instead"
             else -> null
@@ -454,7 +454,7 @@ private fun AiTradeContent(
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     // Label first + capped; the bar takes the REMAINING width, so the
                     // text can never be pushed off the right edge (maintainer #2).
-                    Text("Getting new data…", fontSize = 12.sp, color = TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Updating prices…", fontSize = 12.sp, color = TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     LinearProgressIndicator(modifier = Modifier.weight(1f).clip(RoundedCornerShape(2.dp)), color = GoldAccent, trackColor = DarkBorder)
                 }
             }
@@ -665,7 +665,7 @@ private fun AiTradeContent(
         // ── One honest ceiling line (A5/B0.3a) — never oversell intraday ──────
         item {
             Text(
-                "These are ideas from daily numbers — the app cannot promise profit. Small money is safer in the Stock tab or a monthly SIP.",
+                "These are ideas from daily numbers — the app cannot promise profit. Small money is safer in the Stock tab or Mutual Fund tab.",
                 fontSize = 12.sp,
                 color = TextMuted,
                 lineHeight = 16.sp,
@@ -718,7 +718,7 @@ private fun AiTradeContent(
                     Column(Modifier.padding(4.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(Icons.Default.Search, null, modifier = Modifier.size(16.dp), tint = GoldLight)
-                            Text("Found", fontSize = 12.sp, color = GoldLight, fontWeight = FontWeight.Bold)
+                            Text("Your search found this stock", fontSize = 12.sp, color = GoldLight, fontWeight = FontWeight.Bold)
                         }
                         MasterSignalCard(
                             signal = found,
@@ -759,7 +759,7 @@ private fun AiTradeContent(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
                             Icon(Icons.Default.BarChart, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(20.dp))
                             Column {
-                                Text("More chances today (${otherSignals.size})", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                Text("${otherSignals.size} other good setups today", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                                 Text(if (otherChancesExpanded) "Tap to hide" else "See more", fontSize = 12.sp, color = TextMuted)
                             }
                         }
@@ -824,7 +824,7 @@ private fun AiTradeContent(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            if (state.screenerSearchQuery.isNotEmpty()) "\"${state.screenerSearchQuery}\" not found"
+                            if (state.screenerSearchQuery.isNotEmpty()) "\"${state.screenerSearchQuery}\" not found — try the full company name or NSE symbol"
                             else "No data yet — tap the refresh icon on top to load",
                             style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, color = TextSecondary
                         )
@@ -881,7 +881,7 @@ private fun AiTradeContent(
                 Icon(Icons.Default.Warning, null, tint = TextMuted, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    "This is only to help you learn. No profit is promised. Trading can lose money.",
+                    "This app helps you understand stocks — it does not promise profit. Every trade can lose money, so only use money you can afford to lose.",
                     fontSize = 12.sp, color = TextMuted, textAlign = TextAlign.Center
                 )
             }
@@ -1099,7 +1099,7 @@ private fun IntradayCapitalCaution(capital: Int) {
                 )
             }
             Text(
-                "With small money, charges and fast losses hurt the most. For you, delivery (Stock tab) or a monthly SIP (Mutual Fund tab) is much safer.",
+                "With small money, charges and fast losses hurt the most. For you, the Stock tab (pick and hold) or the Mutual Fund tab (invest a little every month) is much safer.",
                 style = MaterialTheme.typography.bodySmall, color = TextSecondary
             )
         }
@@ -1122,7 +1122,7 @@ private fun SafetyCheckCard(riskResult: RiskGuardResult, vix: Double, noQualifyi
         // mixed message a beginner cannot resolve in ten seconds. When there is no
         // qualifying pick, say so — amber, matching the NO-TRADE shield above —
         // instead of a green go-signal.
-        noQualifyingSignal -> StatusStyle(CautionAmber, Icons.Default.Security, "Calm — but no trade today", "No trade")
+        noQualifyingSignal -> StatusStyle(CautionAmber, Icons.Default.Security, "Market is calm, but no strong pick today — your money is safe", "No trade")
         else -> StatusStyle(GreenPrimary, Icons.Default.CheckCircle, "Safe to Trade", "Safe")
     }
     Surface(color = DarkCard, shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, safeColor.copy(alpha = 0.4f)), modifier = Modifier.fillMaxWidth()) {

@@ -122,7 +122,7 @@ fun LearningScreen(navController: NavController) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        "${guideLessons.count { it.id in readLessons }} of ${guideLessons.size} read",
+                        "${guideLessons.count { it.id in readLessons }} of ${guideLessons.size} completed",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -147,7 +147,7 @@ fun LearningScreen(navController: NavController) {
             // ── Trading styles ────────────────────────────────────────────
             item {
                 Text(
-                    "Ways People Trade and Invest",
+                    "How People Make Money in the Market",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -242,7 +242,7 @@ fun LearningScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "Words other people use — the app itself speaks plainly.",
+                                "Tap to understand words you'll hear others use — the app never uses these on its screens.",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -535,18 +535,18 @@ private val tradingStyles = listOf(
     // Options is a WARNING, not an earning way (A3): most beginners lose here
     TradingStyle(
         title       = "Options Trading (F&O)",
-        subtitle    = "Warning — not a way to earn",
+        subtitle    = "NEVER USE THIS — 9 in 10 beginners lose",
         risk        = "VERY_HIGH",
         time        = "Stay away",
         description = "Most beginners LOSE money in options — SEBI data says about 9 in 10. " +
                       "This app will never recommend options. Do not touch F&O until you have years of experience."
     ),
     TradingStyle(
-        title       = "Mutual Fund SIP",
+        title       = "Monthly Mutual Fund Investment",
         subtitle    = "Invest a little every month",
         risk        = "LOW",
         time        = "5-20+ Years",
-        description = "SIP every month and stay invested. Market will go up and down — do not panic."
+        description = "Invest every month and stay the course. The market goes up and down — do not panic and stop."
     )
 )
 
@@ -695,7 +695,7 @@ private val glossaryTerms = listOf(
     GlossaryTerm("Intraday", "Buying and selling shares within the same day. No position is held overnight."),
     GlossaryTerm("Swing Trade", "Holding shares for a few days to weeks. A style between intraday and long-term investing."),
     GlossaryTerm("Price chart bar", "Each bar on a price chart shows one day's price movement. Green = price went up, red = price went down."),
-    GlossaryTerm("Support", "A price level where the stock repeatedly stops falling. Can be a good place to buy — but it can break, so always set a Stop Loss."),
+    GlossaryTerm("Support", "A price level where the stock repeatedly stops falling. Can be a good place to buy — but it can break, so always have a safety stop."),
     GlossaryTerm("Resistance", "A price level where the stock repeatedly stops rising. Good place to consider booking profit."),
     GlossaryTerm("Price jump (breakout)", "When a stock suddenly trades above a level it was stuck below. Can mean a strong move up — but half of these fail, so always have a safety stop."),
     GlossaryTerm("Open Interest", "How many risky F&O bets are open right now — this app never touches F&O."),

@@ -201,9 +201,9 @@ fun SettingsScreen(navController: NavController, vm: SettingsViewModel = hiltVie
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Advanced — exact percent numbers",
+                        Text("Advanced — fine-tune exact numbers (optional)",
                             style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                        Text("Only if you want to fine-tune. The two choices above are enough.",
+                        Text("Only if you want precise control. The presets above work well for most people.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
@@ -216,21 +216,21 @@ fun SettingsScreen(navController: NavController, vm: SettingsViewModel = hiltVie
             if (showAdvanced) {
                 item {
                     NumberTextField(
-                        label         = "How Much to Risk in One Trade (%)",
+                        label         = "How Much to Risk in One Trade (%) — e.g. 2 means 2%",
                         value         = state.riskPerTrade,
                         onValueChange = { vm.updateRiskPerTrade(it) },
                         errorText     = state.riskError,
-                        helperText    = "That is about ₹${formatIndianRupees(state.capital * state.riskPerTrade / 100.0)} in one trade.",
+                        helperText    = "At ${state.riskPerTrade}%, you risk about ₹${formatIndianRupees(state.capital * state.riskPerTrade / 100.0)} per trade.",
                         resetKey      = presetStamp
                     )
                 }
                 item {
                     NumberTextField(
-                        label         = "Most You Can Lose in One Day (%)",
+                        label         = "Daily Loss Limit (%) — app blocks new trades once reached",
                         value         = state.maxDailyLoss,
                         onValueChange = { vm.updateMaxDailyLoss(it) },
                         errorText     = state.dailyLossError,
-                        helperText    = "The app stops new trades after about ₹${formatIndianRupees(state.capital * state.maxDailyLoss / 100.0)} lost in a day.",
+                        helperText    = "If your losses reach about ₹${formatIndianRupees(state.capital * state.maxDailyLoss / 100.0)} today, no new trades will be suggested.",
                         resetKey      = presetStamp
                     )
                 }
@@ -514,8 +514,7 @@ private fun BatteryOptimizationCard() {
                 color = GoldLight
             )
             Text(
-                "Some phones stop apps from sending alerts overnight. " +
-                "Tap below to allow this app to always send you price alerts.",
+                "Some phones block background alerts automatically. If you miss a safety stop alert, your trade could close silently with a loss. Tap below to allow this app to always reach you.",
                 style = MaterialTheme.typography.bodySmall, color = TextSecondary
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

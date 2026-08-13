@@ -351,7 +351,7 @@ fun NotificationsOffBanner() {
         ) {
             Text("🔕", fontSize = 14.sp)
             Text(
-                "Alerts are OFF — I cannot warn you about safety stops. Tap to turn on.",
+                "Alerts are OFF — the app cannot warn you when your safety stop price is hit. Your trade could close with a big loss silently. Tap to fix.",
                 fontSize   = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color      = TextPrimary,
@@ -506,7 +506,7 @@ fun MyStockCard(
                     onClick = { askSellPrice = true },
                     modifier = Modifier.heightIn(min = 48.dp)
                 ) {
-                    Text("I sold it ✓", color = TextSecondary, fontSize = 12.sp)
+                    Text("I sold it — close this trade", color = TextSecondary, fontSize = 12.sp)
                 }
                 // Voice-parity (U1.5): one tap hears the same verdict the card shows.
                 Spacer(Modifier.weight(1f))

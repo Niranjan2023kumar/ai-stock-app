@@ -266,7 +266,7 @@ fun MutualFundsScreen(navController: NavController) {
                     // U6.1: one plain sentence on WHY a SIP is the safe way (drip-
                     // feeding spreads the ups and downs), not just "it grows big".
                     Text(
-                        text = "Adding a little every month spreads out the ups and downs — the safe way to grow money slowly.",
+                        text = "Invest a small amount every month. When prices fall you buy more, when they rise your money grows — a steady way to build wealth.",
                         fontSize = 13.sp,
                         color = GoldAccent,
                         fontWeight = FontWeight.Medium,
@@ -418,7 +418,7 @@ fun MutualFundsScreen(navController: NavController) {
                                         .height(44.dp)
                                 ) {
                                     Text(
-                                        text = "See ${moreFunds.size} more safe choices",
+                                        text = "See ${moreFunds.size} more options",
                                         color = GoldAccent,
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 13.sp
@@ -491,7 +491,7 @@ private fun MfBeginnerBanner() {
                     color = GoldLight
                 )
                 Text(
-                    text = "Experts invest your money in shares. With a monthly investment plan, you add a little every month.",
+                    text = "A fund manager puts money from thousands of people into a mix of shares. You own a small piece of all of them — so one company falling doesn't wipe you out.",
                     fontSize = 12.sp,
                     color = TextSecondary,
                     lineHeight = 18.sp
@@ -560,8 +560,8 @@ private fun MfCacheBanner(
             }
             Text(
                 text = when {
-                    refreshing -> "$label — getting fresh prices…"
-                    failed -> "$label — could not refresh. Tap to retry."
+                    refreshing -> "$label — fetching today's price…"
+                    failed -> "$label — price update failed. Tap to try again."
                     else -> label
                 },
                 fontSize = 12.sp,
@@ -624,11 +624,11 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
                     onSpeak(
                         "How to start investing, in 3 steps. " +
                         "Step 1: pick one fund below. The first one is the simplest. " +
-                        "Step 2: tap Start investing in Groww, and set it up there. " +
+                        "Step 2: tap Set up monthly investment in Groww, and set it up there. " +
                         "Most funds allow from 500 rupees a month. " +
                         "Step 3: pick a date just after your salary day, like the 1st or the 5th. " +
                         "And never stop your monthly investment when the market falls. " +
-                        "Cheap months buy you more units."
+                        "When prices fall, your money buys more units — so keep going."
                     )
                 })
             }
@@ -637,7 +637,7 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
                 fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
             )
             Text(
-                text = "2. Tap 'Start investing in Groww' and set it up there. Most funds allow from ₹500 a month.",
+                text = "2. Tap 'Set up monthly investment in Groww' and set it up there. Most funds start from ₹500 a month.",
                 fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
             )
             Text(
@@ -645,7 +645,7 @@ private fun MfSipGuidanceCard(onSpeak: (String) -> Unit) {
                 fontSize = 12.sp, color = TextSecondary, lineHeight = 17.sp
             )
             Text(
-                text = "Never stop your monthly investment when the market falls. Cheap months buy you MORE units — stopping then is the #1 beginner mistake.",
+                text = "Never stop when the market falls — when prices are low, your money buys MORE units. Stopping in a dip is the #1 mistake beginners make.",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = GoldLight,
@@ -845,7 +845,7 @@ private fun MySipCard(
             // ── Growth line — real NAV data only, never invented (rule B6) ──
             when {
                 sip.totalInvested <= 0.0 -> Text(
-                    text = "No payments counted yet. Tap Yes on your monthly investment day and this line will grow.",
+                    text = "No payments recorded yet. On day ${sip.sipDay} of each month, tap 'Yes, money went' and this will show your real growth.",
                     fontSize = 11.sp,
                     color = TextMuted,
                     lineHeight = 16.sp
@@ -873,7 +873,7 @@ private fun MySipCard(
                     }
                 }
                 else -> Text(
-                    text = "Your ₹${formatIndianRupees(sip.totalInvested)} monthly investment. Could not get today's price — tap to retry.",
+                    text = "Your ₹${formatIndianRupees(sip.totalInvested)} invested so far. Today's price is unavailable — tap to try again.",
                     fontSize = 11.sp,
                     color = TextSecondary,
                     lineHeight = 16.sp,
@@ -1018,7 +1018,7 @@ private fun MfFundCard(
             if (highlight && !expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Most funds allow from ₹500 a month.",
+                    text = "You can start from ₹500 a month — no minimum beyond that.",
                     fontSize = 11.sp,
                     color = TextSecondary,
                     lineHeight = 15.sp
@@ -1501,7 +1501,7 @@ private fun MfStartSipSection(
         ) {
             val contentTint = if (isRisky) TextMuted else TextOnGold
             Text(
-                text = "Start investing in Groww",
+                text = "Set up monthly investment in Groww",
                 color = contentTint,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp
