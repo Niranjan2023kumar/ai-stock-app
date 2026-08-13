@@ -24,7 +24,10 @@ object SignalEngine {
         val dayLow: Double,
         val marketState: String,
         val historicalCloses: List<Double> = emptyList(),  // 1-year daily closes for period analysis
-        val gapPercent: Double = 0.0   // open vs prev-close gap — feeds RiskGuard Rule 5
+        val gapPercent: Double = 0.0,   // open vs prev-close gap — feeds RiskGuard Rule 5
+        // H8 earnings blackout: Unix-ms of the NEXT scheduled results date from Yahoo.
+        // 0 = unknown. IntradayRepository filters BUY signals when this is within 2 days.
+        val earningsTimestampMs: Long = 0L
     )
 
     /** Analyze all quotes, return qualifying signals sorted by confidence. */

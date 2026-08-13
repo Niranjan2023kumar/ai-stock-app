@@ -350,7 +350,9 @@ class IntradayRepository @Inject constructor(
                 union
             } else engineSignals
             val newsVet = fetchNewsSentiments(vetBasis)
-            val signals = applyNewsSentiments(engineSignals, newsVet)
+            // H8 earnings blackout: remove BUY signals for stocks with results ≤2 days away.
+            // Applied AFTER news sentiment so news-adjusted confidence is the final word.
+            val signals = applyEarningsBlackout(applyNewsSentiments(engineSignals, newsVet), quotes)
             // Stock-tab picks stay DELIVERY-timeframe (daily bars only — correct
             // per spec): when intraday context was used, the daily-only baseline
             // is carried alongside for pick selection.
@@ -361,7 +363,9 @@ class IntradayRepository @Inject constructor(
             // volatility; `signals` (Intraday tab) is left byte-for-byte alone.
             val dailyBase =
                 if (intradayPowered) applyNewsSentiments(baseSignals, newsVet) else signals
-            val dailySignals = applyDeliveryGeometry(dailyBase, quotes)
+            val dailySignals = applyDeliveryGeometry(
+                applyEarningsBlackout(dailyBase, quotes), quotes
+            )
             val topMovers = quotes
                 .sortedByDescending { abs(it.changePercent) }
                 .take(12)
@@ -745,6 +749,40 @@ class IntradayRepository @Inject constructor(
      * [DELIVERY_VOL_LOOKBACK] closes of history, or any error, and the signal
      * passes through byte-for-byte unchanged — current behavior exactly.
      */
+    /**
+     * H8 Earnings blackout: drop BUY signals for stocks whose next scheduled
+     * results date (from Yahoo meta.earningsTimestamp) is within 2 calendar days.
+     * Results days are gambles, not trades — the app must never advise buying
+     * right before a company reports its numbers. Fail-safe: 0 = unknown → kept.
+     */
+    private fun applyEarningsBlackout(
+        signals: List<TradingSignal>,
+        quotes: List<SignalEngine.StockQuote>
+    ): List<TradingSignal> {
+        val earningsMap = HashMap<String, Long>(quotes.size * 2)
+        for (q in quotes) {
+            if (q.earningsTimestampMs > 0L) {
+                earningsMap[q.symbol.removeSuffix(".NS").uppercase()] = q.earningsTimestampMs
+            }
+        }
+        if (earningsMap.isEmpty()) return signals
+        val twoDaysMs = 2L * 24 * 60 * 60 * 1000L
+        val nowMs = System.currentTimeMillis()
+        var blocked = 0
+        val out = signals.filter { sig ->
+            if (sig.action != SignalAction.BUY) return@filter true   // SELL/WAIT unchanged
+            val earningsMs = earningsMap[sig.stockSymbol.removeSuffix(".NS").uppercase()] ?: return@filter true
+            val daysAway = (earningsMs - nowMs) / (24L * 60 * 60 * 1000L)
+            if (earningsMs > nowMs && earningsMs - nowMs <= twoDaysMs) {
+                blocked++
+                Log.d(TAG, "H8 earnings blackout: ${sig.stockSymbol} results in ~${daysAway}d — BUY dropped")
+                false
+            } else true
+        }
+        if (blocked > 0) Log.d(TAG, "H8 earnings blackout: $blocked BUY signal(s) removed")
+        return out
+    }
+
     private fun applyDeliveryGeometry(
         signals: List<TradingSignal>,
         quotes: List<SignalEngine.StockQuote>
@@ -1437,24 +1475,36 @@ class IntradayRepository @Inject constructor(
                 avgVol = last63.average().toLong()
             }
 
+            // H8 earnings blackout: nearest scheduled results date in Unix-ms.
+            // Yahoo meta may carry earningsTimestamp (confirmed date) or
+            // earningsTimestampStart / earningsTimestampEnd (estimate range).
+            // Take the earliest non-zero, convert seconds → ms.
+            val earningsTs = run {
+                val confirmed = meta.optLong("earningsTimestamp", 0L)
+                val rangeStart = meta.optLong("earningsTimestampStart", 0L)
+                listOf(confirmed, rangeStart).filter { it > 0L }
+                    .minOrNull() ?: 0L
+            } * 1000L
+
             SignalEngine.StockQuote(
-                symbol           = symbol,
-                name             = name,
-                price            = price,
-                changePercent    = changePercent,
-                volume           = volume,
+                symbol              = symbol,
+                name                = name,
+                price               = price,
+                changePercent       = changePercent,
+                volume              = volume,
                 // 0 when Yahoo omits it and no volume history exists — volRatio
                 // consumers guard on `> 0` and stay neutral rather than fabricating.
-                avgVolume        = avgVol,
-                high52w          = high52w,
-                low52w           = low52w,
-                ma50             = ma50,
-                ma200            = ma200,
-                dayHigh          = dayHigh,
-                dayLow           = dayLow,
-                marketState      = marketState,
-                historicalCloses = closes,  // full 1-year history for period filters
-                gapPercent       = gapPercent
+                avgVolume           = avgVol,
+                high52w             = high52w,
+                low52w              = low52w,
+                ma50                = ma50,
+                ma200               = ma200,
+                dayHigh             = dayHigh,
+                dayLow              = dayLow,
+                marketState         = marketState,
+                historicalCloses    = closes,  // full 1-year history for period filters
+                gapPercent          = gapPercent,
+                earningsTimestampMs = earningsTs
             )
         }.getOrNull()
     }
