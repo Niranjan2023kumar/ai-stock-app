@@ -142,6 +142,7 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 - [x] H9: psychology guard — after 2+ consecutive REAL losses today, caution fires immediately (todayConsecutiveLosses() in TradeTrackerRepository + wired into InterdayViewModel.refreshCautionMode())
 - [x] H13: auto-caution mode — fires when recent win rate < 30% over last 10 real outcomes (OutcomeRecorder.recentWinRate() + _cautionMessage in InterdayViewModel)
 - [x] Angel One SmartAPI full stack — SmartApiClient (login/session/candle), SmartApiFeed (WebSocket live ticks), SmartApiStore (AES-256-GCM encrypted storage), InstrumentMaster (symbol→token), SmartApiSettingsCard (full Settings UI with Test connection button)
+- [x] Fix wave v1.6 — deep audit fixes: v7 dead API removed from fetchMarketHealthInternal/fetchIndiaVix/fetchIndices (saves 14-16s/refresh); TATAMOTORS→TMPV in sector map (H7 now correct); SmartApiFeed re-subscribes on symbol change; TradeWatchService checks NSE holidays; auto-refresh timer won't cancel first-of-day 200-stock fetch
 
 ---
 
@@ -226,5 +227,5 @@ In simple English. With a voice option. While the app silently protects them fro
 **When that is true on a real phone, the project is done.**
 
 ---
-*Last updated by operator: 2026-08-13 (session 5 — UI fix wave v2.0, H9 psychology guard, H13 auto-caution, SmartAPI full stack verified; ALL features complete; project CLOSED)*
+*Last updated by operator: 2026-08-13 (session 6 — Fix wave v1.6: dead v7 API removed from all 3 methods, TMPV sector fix, SmartApiFeed re-subscribe fix, holiday-aware TradeWatchService, first-fetch guard; project CLOSED with zero known bugs)*
 *Source of truth: docs/REQUIREMENTS_FINAL.md — never contradict it*
