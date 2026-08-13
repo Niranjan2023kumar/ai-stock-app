@@ -137,6 +137,11 @@ docs/REQUIREMENTS_FINAL.md  ← THE source of truth for all features
 - [x] F6.2: Contextual news — StockNewsSection in TradingScreen + HomeScreen (fetchYahooNews, max 3, async, hides when empty)
 - [x] F7.5: Market-closed countdown — already in HomeScreen OneDecisionCard (nextMarketOpenMs)
 - [x] F8.1: Phone brand battery deep-link — BatteryOptimizationCard in SettingsScreen (MIUI/Samsung/Oppo/Vivo/Realme/OnePlus)
+- [x] UI fix wave v2.0: plain-English sweep across all 6 main screens (SIP→monthly investment, clearer disclaimers, alerts-off banner explains money risk, score breakdown, 40+ string fixes)
+- [x] H8: earnings blackout — no BUY within 2 days of results date (Yahoo earningsTimestamp extracted, applyEarningsBlackout() in IntradayRepository)
+- [x] H9: psychology guard — after 2+ consecutive REAL losses today, caution fires immediately (todayConsecutiveLosses() in TradeTrackerRepository + wired into InterdayViewModel.refreshCautionMode())
+- [x] H13: auto-caution mode — fires when recent win rate < 30% over last 10 real outcomes (OutcomeRecorder.recentWinRate() + _cautionMessage in InterdayViewModel)
+- [x] Angel One SmartAPI full stack — SmartApiClient (login/session/candle), SmartApiFeed (WebSocket live ticks), SmartApiStore (AES-256-GCM encrypted storage), InstrumentMaster (symbol→token), SmartApiSettingsCard (full Settings UI with Test connection button)
 
 ---
 
@@ -180,7 +185,9 @@ Most features are done. Remaining work listed below.
 - [x] **F8.1** Phone brand battery/autostart deep-link — BatteryOptimizationCard in SettingsScreen. Detects Xiaomi/Samsung/Oppo/Vivo/Realme/OnePlus, launches brand-specific intent, fallback to app details.
 
 ### NEXT PRIORITIES
-All F1–F8 features are complete. Project is done per DEFINITION OF DONE.
+ALL FEATURES COMPLETE — F1–F8, H8, H9, H13, SmartAPI, UI sweep all done.
+Project is fully done per DEFINITION OF DONE.
+Maintainer triggers run audit-only (jargon scan + crash safety + dead API check).
 
 ---
 
@@ -219,5 +226,5 @@ In simple English. With a voice option. While the app silently protects them fro
 **When that is true on a real phone, the project is done.**
 
 ---
-*Last updated by operator: 2026-08-13 (session 4 — F6.2, F7.5 verified, F8.1 done; ALL F1–F8 complete; full jargon+crash+dead-API audit passed)*
+*Last updated by operator: 2026-08-13 (session 5 — UI fix wave v2.0, H9 psychology guard, H13 auto-caution, SmartAPI full stack verified; ALL features complete; project CLOSED)*
 *Source of truth: docs/REQUIREMENTS_FINAL.md — never contradict it*
