@@ -9,8 +9,10 @@ import com.example.myapplication3.database.entity.TrackedTradeEntity
 import com.example.myapplication3.groww.OrderType
 import com.example.myapplication3.intraday.PendingOrder
 import com.example.myapplication3.intraday.roundTripCostRs
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.Calendar
 import java.util.UUID
@@ -241,6 +243,23 @@ class TradeTrackerRepository @Inject constructor(
                 timestampMs = ts
             )
         }.getOrNull()
+    }
+
+    /**
+     * H9 psychology guard: count of consecutive REAL losses at the start of
+     * today's closed-trade list (DAO returns newest-first). Returns 0 when no
+     * real trades have been closed today. Fail-safe — returns 0 on any error so
+     * a DB hiccup never incorrectly blocks a good trade.
+     */
+    suspend fun todayConsecutiveLosses(): Int = withContext(Dispatchers.IO) {
+        runCatching {
+            val today = dao.getClosedSinceOnce(todayStartMs(), false) // DESC by closedAt
+            var count = 0
+            for (t in today) {
+                if ((t.realizedPnl ?: 0.0) < 0.0) count++ else break
+            }
+            count
+        }.getOrDefault(0)
     }
 
     private fun todayStartMs(): Long = Calendar.getInstance().apply {

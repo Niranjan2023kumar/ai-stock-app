@@ -669,7 +669,14 @@ class InterdayViewModel @Inject constructor(
      * OutcomeRecorder only ever records real-money closes.
      */
     private suspend fun refreshCautionMode() {
-        val active = withContext(Dispatchers.IO) {
+        // H9: 2+ consecutive REAL losses TODAY → immediate psychology pause
+        val consecutiveLosses = withContext(Dispatchers.IO) {
+            tradeTracker.todayConsecutiveLosses()
+        }
+        val h9Active = consecutiveLosses >= 2
+
+        // H13: poor recent win rate over last 10 REAL outcomes → system caution
+        val h13Active = withContext(Dispatchers.IO) {
             runCatching {
                 val recentCount = performanceTracker.getTradeOutcomes()
                     .sortedByDescending { it.closedAt }
@@ -679,10 +686,16 @@ class InterdayViewModel @Inject constructor(
                 recentCount >= 6 && rate != null && rate < 0.30
             }.getOrDefault(false)
         }
+
+        val active = h9Active || h13Active
         _cautionActive.value = active
-        _cautionMessage.value = if (active)
-            "The system is not doing well right now - better to pause today."
-        else null
+        _cautionMessage.value = when {
+            h9Active ->
+                "You have had $consecutiveLosses losses in a row today — better to pause and come back tomorrow with fresh eyes."
+            h13Active ->
+                "The system is not doing well right now — better to pause today."
+            else -> null
+        }
     }
 
     /**
