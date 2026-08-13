@@ -93,10 +93,18 @@ class SmartApiFeed @Inject constructor(
      * with a fresh failure budget — a config change is a reason to try again.
      */
     fun start(symbols: List<String>) {
+        val changed = desiredSymbols != symbols
         desiredSymbols = symbols
         shouldRun = true
         ensureCredsWatch()
-        if (controlJob?.isActive == true) return
+        if (controlJob?.isActive == true) {
+            // WRONG-5 fix: if the symbol set changed while the feed is already running,
+            // drop the current WebSocket so the control loop reconnects and re-subscribes
+            // with the new symbol set immediately — without this, new stocks get no live
+            // ticks until the next natural reconnect (which could be many minutes away).
+            if (changed) ws?.cancel()
+            return
+        }
         loginFailures = 0
         backoffMs = INITIAL_BACKOFF_MS
         controlJob = scope.launch { runFeed() }

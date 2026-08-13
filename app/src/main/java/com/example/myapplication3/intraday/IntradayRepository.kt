@@ -948,33 +948,8 @@ class IntradayRepository @Inject constructor(
      */
     suspend fun fetchIndices(): List<IndexQuote> = withContext(Dispatchers.IO) {
         indicesForeground.first { it }
+        // v7 is dead (HTTP 401) — go directly to individual v8 chart calls per index
         runCatching {
-            val nameMap = indexSymbols.toMap()
-            val syms = java.net.URLEncoder.encode(indexSymbols.joinToString(",") { it.first }, "UTF-8")
-            for (host in YF_HOSTS) {
-                val body = runCatching {
-                    fetchUrl("https://$host/v7/finance/quote?symbols=$syms&lang=en&region=IN", fastClient)
-                }.getOrNull() ?: continue
-                val results = JSONObject(body).optJSONObject("quoteResponse")?.optJSONArray("result")
-                if (results != null && results.length() > 0) {
-                    return@runCatching (0 until results.length()).mapNotNull { i ->
-                        runCatching {
-                            val q = results.getJSONObject(i)
-                            val sym = q.optString("symbol", "")
-                            val price = q.optDouble("regularMarketPrice", 0.0)
-                            if (price <= 0) return@runCatching null
-                            IndexQuote(
-                                symbol        = sym,
-                                name          = nameMap[sym] ?: sym,
-                                price         = price,
-                                change        = q.optDouble("regularMarketChange", 0.0),
-                                changePercent = q.optDouble("regularMarketChangePercent", 0.0)
-                            )
-                        }.getOrNull()
-                    }
-                }
-            }
-            // v7 failed everywhere — fall back to one v8 chart call per index
             indexSymbols.mapNotNull { (sym, name) ->
                 runCatching {
                     val enc = java.net.URLEncoder.encode(sym, "UTF-8")
@@ -2062,35 +2037,12 @@ class IntradayRepository @Inject constructor(
     // ─── Market health ────────────────────────────────────────────────────────
 
     private fun fetchMarketHealthInternal(): MarketHealth {
-        val niftySymbol = "%5ENSEI"
-        // Try v7 on all hosts first
-        var body: String? = null
-        for (host in YF_HOSTS) {
-            body = runCatching {
-                fetchUrl("https://$host/v7/finance/quote?symbols=$niftySymbol&lang=en&region=IN", fastClient)
-            }.getOrNull()
-            if (body != null) break
-        }
-        // Fallback to v8 chart for Nifty
-        if (body == null) {
-            body = runCatching {
-                fetchUrl("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?interval=1d&range=5d", chartClient)
-            }.getOrNull()
-        }
-
-        val safeBody = body ?: return defaultHealth()
+        // v7 is dead (HTTP 401) — go directly to v8 chart which reliably works
+        val body = runCatching {
+            fetchUrl("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?interval=1d&range=5d", chartClient)
+        }.getOrNull() ?: return defaultHealth()
         return runCatching {
-            val root    = JSONObject(safeBody)
-            val results = root.optJSONObject("quoteResponse")?.optJSONArray("result")
-            if (results != null && results.length() > 0) {
-                val nifty  = results.getJSONObject(0)
-                val change = nifty.optDouble("regularMarketChangePercent", 0.0)
-                val price  = nifty.optDouble("regularMarketPrice", 0.0)
-                val state  = nifty.optString("marketState", "CLOSED")
-                return buildHealth(change, price, state)
-            }
-
-            val chartResults = root.optJSONObject("chart")?.optJSONArray("result")
+            val chartResults = JSONObject(body).optJSONObject("chart")?.optJSONArray("result")
             if (chartResults != null && chartResults.length() > 0) {
                 val chartResult = chartResults.getJSONObject(0)
                 val meta  = chartResult.getJSONObject("meta")
@@ -2109,7 +2061,6 @@ class IntradayRepository @Inject constructor(
                 val state  = meta.optString("marketState", "CLOSED")
                 return buildHealth(change, price, state)
             }
-
             defaultHealth()
         }.getOrElse { defaultHealth() }
     }
@@ -2133,31 +2084,15 @@ class IntradayRepository @Inject constructor(
     // ─── India VIX ───────────────────────────────────────────────────────────────
 
     /**
-     * Fetches India VIX from Yahoo Finance (%5EINDIAVIX).
-     * Tries the v7 quote first, then falls back to the v8 chart meta price —
-     * v7 is dead (HTTP 401 without a crumb), and without the fallback the VIX
+     * Fetches India VIX from Yahoo Finance (%5EINDIAVIX) via v8 chart.
+     * v7 is dead (HTTP 401) so we go directly to v8 — without this the VIX
      * stayed 0.0 forever and RiskGuard Rule 7 never engaged.
      * Returns 0.0 on any failure so RiskGuard Rule 7 is simply skipped.
      */
     suspend fun fetchIndiaVix(): Double = withContext(Dispatchers.IO) {
+        // v7 is dead (HTTP 401) — go directly to v8 chart
         runCatching {
-            val vixSymbol = "%5EINDIAVIX"
-            var body: String? = null
-            for (host in YF_HOSTS) {
-                body = runCatching {
-                    fetchUrl("https://$host/v7/finance/quote?symbols=$vixSymbol&lang=en&region=IN", fastClient)
-                }.getOrNull()
-                if (body != null) break
-            }
-            if (body != null) {
-                val result = JSONObject(body).optJSONObject("quoteResponse")?.optJSONArray("result")
-                if (result != null && result.length() > 0) {
-                    val price = result.getJSONObject(0).optDouble("regularMarketPrice", 0.0)
-                    if (price > 0) return@runCatching price
-                }
-            }
-            // v7 failed everywhere — one v8 chart call, same pattern as fetchIndices
-            val chartBody = fetchUrl("https://query1.finance.yahoo.com/v8/finance/chart/$vixSymbol?interval=1d&range=1d", chartClient)
+            val chartBody = fetchUrl("https://query1.finance.yahoo.com/v8/finance/chart/%5EINDIAVIX?interval=1d&range=1d", chartClient)
             JSONObject(chartBody).getJSONObject("chart")
                 .getJSONArray("result").getJSONObject(0)
                 .getJSONObject("meta")

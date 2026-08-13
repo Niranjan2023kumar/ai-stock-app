@@ -1102,6 +1102,12 @@ class InterdayViewModel @Inject constructor(
                 // Suspend here until the app is visible again — the moment the user
                 // returns, this resumes and refreshes immediately (fresh prices).
                 _isForeground.first { it }
+                // SLOW-3: don't cancel a still-running first-of-day 200-symbol fetch.
+                // launchFetch() cancels any in-flight job — if the heavy initial load
+                // hasn't finished yet, killing it here means stale data shows forever.
+                // Skip this auto-refresh tick instead; the running fetch will complete
+                // and post fresh signals on its own.
+                if (fetchJob?.isActive == true) continue
                 val hasCurrent = _uiState.value.signals.isNotEmpty()
                 _uiState.update { it.copy(isLoading = true) }
                 launchFetch(silent = hasCurrent)
@@ -1333,7 +1339,7 @@ class InterdayViewModel @Inject constructor(
         listOf("SUNPHARMA","CIPLA","DRREDDY","DIVISLAB","LUPIN","AUROPHARMA","TORNTPHARM","ALKEM",
             "ZYDUSLIFE","MANKIND","LAURUSLABS","NATCOPHARM","AJANTPHARM","SYNGENE","LALPATHLAB",
             "METROPOLIS","FORTIS","MAXHEALTH","APOLLOHOSP").forEach { put(it, "PHARMA") }
-        listOf("MARUTI","TATAMOTORS","EICHERMOT","HEROMOTOCO","BAJAJ-AUTO","TVSMOTOR","BALKRISIND",
+        listOf("MARUTI","TMPV","EICHERMOT","HEROMOTOCO","BAJAJ-AUTO","TVSMOTOR","BALKRISIND",
             "MRF","APOLLOTYRE","CEATLTD","SONACOMS","EXIDEIND","TIINDIA").forEach { put(it, "AUTO") }
         listOf("ITC","HINDUNILVR","NESTLEIND","BRITANNIA","TATACONSUM","DABUR","MARICO","GODREJCP",
             "COLPAL","EMAMILTD","VBL","UBL","RADICO","MCDOWELL-N","NYKAA","DMART","TRENT","PAGEIND").forEach { put(it, "FMCG") }

@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.myapplication3.core.common.Constants
+import com.example.myapplication3.core.common.MarketCalendar
 import com.example.myapplication3.intraday.IntradayRepository
 import com.example.myapplication3.notifications.manager.StockNotificationManager
 import com.example.myapplication3.smartapi.SmartApiFeed
@@ -46,6 +47,7 @@ class TradeWatchService : Service() {
     @Inject lateinit var smartApiStore: SmartApiStore
     @Inject lateinit var notifier: StockNotificationManager
     @Inject lateinit var tts: HindiTtsManager
+    @Inject lateinit var marketCalendar: MarketCalendar
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var job: Job? = null
@@ -186,11 +188,13 @@ class TradeWatchService : Service() {
         }
     }
 
-    /** NSE trading window in IST: Mon–Fri 9:15–15:30 (holidays ignored — harmless). */
+    /** NSE trading window in IST: Mon–Fri, non-holiday, 9:15–15:30. */
     private fun isMarketHours(): Boolean {
         val cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("Asia/Kolkata"))
         val dow = cal.get(java.util.Calendar.DAY_OF_WEEK)
         if (dow == java.util.Calendar.SATURDAY || dow == java.util.Calendar.SUNDAY) return false
+        // NSE holiday check — stops unnecessary polling on trading holidays (e.g. Diwali)
+        if (runCatching { marketCalendar.isHoliday() }.getOrDefault(false)) return false
         val min = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + cal.get(java.util.Calendar.MINUTE)
         return min in (9 * 60 + 15)..(15 * 60 + 30)
     }
